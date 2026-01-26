@@ -1,0 +1,141 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { DIARY_ANALYSIS_PROMPT } from '@/lib/prompts';
+import { AnalysisResult } from '@/types';
+import { checkRateLimit, getClientIdentifier } from '@/lib/rate-limit';
+import { validateTranscript, sanitizeTranscript, isValidEmotion } from '@/lib/validations';
+
+export async function POST(request: NextRequest) {
+  try {
+    // Rate limiting
+    const clientId = getClientIdentifier(request);
+    const rateLimit = checkRateLimit(clientId, {
+      maxRequests: 20,    // 20 requests
+      windowMs: 60 * 1000, // per minute
+    });
+
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        { error: '요청이 너무 많습니다. 잠시 후 다시 시도해주세요.' },
+        {
+          status: 429,
+          headers: {
+            'X-RateLimit-Remaining': '0',
+            'X-RateLimit-Reset': String(Math.ceil(rateLimit.resetIn / 1000)),
+          },
+        }
+      );
+    }
+
+    // Parse and validate request
+    const body = await request.json();
+    const validation = validateTranscript(body.transcript);
+
+    if (!validation.valid) {
+      return NextResponse.json(
+        { error: validation.error },
+        { status: 400 }
+      );
+    }
+
+    const transcript = sanitizeTranscript(body.transcript);
+
+    // Check API key
+    const apiKey = process.env.ANTHROPIC_API_KEY;
+    if (!apiKey) {
+      return NextResponse.json(
+        { error: 'API 키가 설정되지 않았습니다.' },
+        { status: 500 }
+      );
+    }
+
+    const prompt = DIARY_ANALYSIS_PROMPT.replace('{transcript}', transcript);
+
+    // Call Claude API
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+      },
+      body: JSON.stringify({
+        model: 'claude-3-5-haiku-20241022',
+        max_tokens: 256,
+        messages: [
+          {
+            role: 'user',
+            content: prompt,
+          },
+        ],
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.text();
+      console.error('Claude API error:', errorData);
+      return NextResponse.json(
+        { error: 'AI 분석 중 오류가 발생했습니다.' },
+        { status: 500 }
+      );
+    }
+
+    const data = await response.json();
+    const content = data.content[0]?.text;
+
+    if (!content) {
+      return NextResponse.json(
+        { error: 'AI 응답이 비어있습니다.' },
+        { status: 500 }
+      );
+    }
+
+    // Parse JSON response
+    let result: AnalysisResult;
+    try {
+      // Extract JSON from response (handle markdown code blocks)
+      const jsonMatch = content.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) {
+        throw new Error('JSON not found in response');
+      }
+      result = JSON.parse(jsonMatch[0]);
+    } catch {
+      console.error('Failed to parse AI response:', content);
+      return NextResponse.json(
+        { error: 'AI 응답을 파싱할 수 없습니다.' },
+        { status: 500 }
+      );
+    }
+
+    // Validate and sanitize result
+    if (!Array.isArray(result.keywords) || result.keywords.length === 0) {
+      result.keywords = ['일상'];
+    } else {
+      // Limit to 5 keywords, sanitize each
+      result.keywords = result.keywords
+        .slice(0, 5)
+        .map(k => String(k).slice(0, 20));
+    }
+
+    if (!isValidEmotion(result.emotion)) {
+      result.emotion = 'neutral';
+    }
+
+    if (!result.summary || typeof result.summary !== 'string') {
+      result.summary = '오늘의 기록';
+    } else {
+      result.summary = result.summary.slice(0, 50);
+    }
+
+    return NextResponse.json(result, {
+      headers: {
+        'X-RateLimit-Remaining': String(rateLimit.remaining),
+      },
+    });
+  } catch (error) {
+    console.error('Analysis error:', error);
+    return NextResponse.json(
+      { error: '서버 오류가 발생했습니다.' },
+      { status: 500 }
+    );
+  }
+}
