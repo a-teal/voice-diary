@@ -223,16 +223,36 @@ full: 9999px (pill, circle)
 
 피그마에서 다음 프레임 작업 부탁드립니다:
 
-1. **일간 뷰** - 일기 있음 / 없음 상태
-2. **녹음 모달** - 대기 / 녹음 중 / 분석 중 상태
-3. **월간 캘린더**
-4. **통계 페이지**
-5. **컴포넌트 라이브러리** (버튼, 카드, 태그, 네비게이션)
+1. **일간 뷰** - 일기 있음 / 없음 상태 ✅ 완료
+2. **녹음 모달** - 대기 / 녹음 중 / 분석 중 상태 ✅ 완료
+3. **월간 캘린더** ✅ 완료
+4. **통계 페이지** ✅ 완료
+5. **컴포넌트 라이브러리** (버튼, 카드, 태그, 네비게이션) ✅ 완료
+
+---
+
+## 9. 구현 현황 (2025-01-27)
+
+### 적용 완료
+- [x] 일간 뷰 (DailyView) - Design/src/app/components/views/DailyView.tsx 기반
+- [x] 녹음 모달 (RecordingModal) - framer-motion 애니메이션 적용
+- [x] 월간 캘린더 (CalendarView) - 새 그리드 레이아웃
+- [x] 통계 페이지 (StatsView) - Recharts 그래프, 키워드 클라우드
+- [x] 하단 네비게이션 (BottomNav) - lucide-react 아이콘
+- [x] 일기 카드 (EntryCard) - 새 레이아웃, 시간 표시
+- [x] 헤더 (Header) - 날짜 네비게이션
+
+### 사용 라이브러리
+- lucide-react: 아이콘
+- framer-motion: 애니메이션
+- date-fns: 날짜 포맷
+- sonner: 토스트 알림
+- recharts: 차트
 
 ---
 
 ## 참고
 
 - 현재 앱: https://voice-diary-eta.vercel.app
-- 기술 스택: React, Tailwind CSS
-- 디자인 핸드오프 후 개발 적용 예정
+- 기술 스택: Next.js 15.3.4, React 19, Tailwind CSS v4
+- 디자인 적용 완료 (2025-01-27)

@@ -3,7 +3,7 @@
 ## Phase 1: MVP 핵심 기능 ✅
 
 ### 1.1 프로젝트 셋업
-- [x] Next.js 16 프로젝트 생성 (App Router)
+- [x] Next.js 15.3.4 프로젝트 생성 (App Router)
 - [x] TypeScript 설정
 - [x] Tailwind CSS 설정
 - [x] ESLint 설정
@@ -138,3 +138,17 @@
 | GitHub | ✅ 완료 | https://github.com/a-teal/voice-diary |
 | iOS | 🔄 테스트 중 | Xcode 프로젝트 + Speech Recognition |
 | Android | 🔄 설정 완료 | Android Studio 프로젝트 생성됨 |
+
+---
+
+## 배포 이슈 해결 기록
+
+### Vercel 배포 (2025-01-27)
+- **문제 1**: Next.js 16 Turbopack + lightningcss 네이티브 바이너리 호환 문제
+  - 해결: Next.js 15.3.4로 다운그레이드
+- **문제 2**: Next.js 15.3.3 보안 취약점 (CVE-2025-66478)
+  - 해결: Next.js 15.3.4로 업그레이드
+- **문제 3**: Git 저장소 위치 문제 (상위 폴더에 .git 있음)
+  - 해결: Project Dairy 폴더에 새 git 저장소 초기화
+- **문제 4**: apps/web이 서브모듈(160000)로 커밋됨
+  - 해결: `git rm --cached apps/web && git add apps/web/`

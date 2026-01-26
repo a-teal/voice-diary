@@ -136,10 +136,13 @@ interface DiaryEntry {
 ### 6.1 프론트엔드
 | 기술 | 선택 이유 |
 |------|-----------|
-| Next.js 14 | SSR + PWA 지원, 빠른 개발 |
+| Next.js 15.3.4 | App Router, 정적 빌드 지원 |
 | TypeScript | 타입 안정성 |
-| Tailwind CSS | 빠른 스타일링 |
-| PWA | 모바일 앱처럼 설치 가능 |
+| Tailwind CSS v4 | 빠른 스타일링 |
+| Capacitor | iOS/Android 네이티브 앱 |
+| lucide-react | 아이콘 라이브러리 |
+| framer-motion | 애니메이션 |
+| recharts | 차트 시각화 |
 
 ### 6.2 백엔드/인프라
 | 기술 | 선택 이유 |
@@ -160,31 +163,41 @@ interface DiaryEntry {
 
 ## 7. 개발 단계
 
-### Phase 1: MVP 핵심 기능
+### Phase 1: MVP 핵심 기능 ✅ 완료
 **목표**: 음성으로 일기 쓰고 AI 분석 결과 보기
 
-- [ ] 프로젝트 셋업 (Next.js + PWA)
-- [ ] 음성 녹음 + 실시간 STT (Web Speech API)
-- [ ] AI 분석 API 연동 (Claude)
-- [ ] 일간 뷰 UI
-- [ ] 로컬 저장 (IndexedDB/localStorage)
+- [x] 프로젝트 셋업 (Next.js + 모노레포)
+- [x] 음성 녹음 + 실시간 STT (Web Speech API)
+- [x] AI 분석 API 연동 (Claude)
+- [x] 일간 뷰 UI
+- [x] 로컬 저장 (localStorage)
 
-### Phase 2: 시각화
+### Phase 2: 시각화 ✅ 완료
 **목표**: 감정 패턴을 시각적으로 파악
 
-- [ ] 월간 캘린더 뷰
-- [ ] 주간 키워드 클라우드
-- [ ] 감정 변화 그래프
-- [ ] 날짜 네비게이션
+- [x] 월간 캘린더 뷰
+- [x] 키워드 클라우드
+- [x] 감정 변화 그래프 (Recharts)
+- [x] 날짜 네비게이션 (스와이프)
 
-### Phase 3: 고도화
+### Phase 3: 모바일 앱 🔄 진행 중
+**목표**: iOS/Android 네이티브 앱
+
+- [x] Capacitor 설정
+- [x] iOS/Android 프로젝트 생성
+- [x] 네이티브 음성인식 플러그인
+- [ ] iOS Simulator 테스트
+- [ ] Android Emulator 테스트
+- [ ] 앱 스토어 배포
+
+### Phase 4: 고도화 (예정)
 **목표**: 사용성 개선 및 기능 확장
 
 - [ ] 연간 통계 뷰
-- [ ] 텍스트 편집 기능
+- [ ] 일기 수정/삭제 기능
 - [ ] 로그인 + 클라우드 동기화 (Supabase)
 - [ ] 알림/리마인더
-- [ ] PWA 최적화 (오프라인 지원)
+- [ ] 오프라인 지원
 
 ---
 
@@ -220,8 +233,19 @@ interface DiaryEntry {
 
 | 이슈 | 결정 | 비고 |
 |------|------|------|
-| 플랫폼 | ✅ PWA 웹앱 | 모바일처럼 설치 가능 |
-| 음성 변환 | ✅ Web Speech API (실시간) | 무료, 정확도 이슈 시 Whisper 검토 |
+| 플랫폼 | ✅ 웹 + 네이티브 앱 | Capacitor로 iOS/Android 지원 |
+| 음성 변환 | ✅ Web Speech API + Capacitor Speech Recognition | 웹/네이티브 통합 |
 | 로그인 | ✅ 필수 아님 | 로컬 저장 기본, 로그인 시 클라우드 동기화 |
 | 수익 모델 | ✅ 보류 | MVP 이후 검토 |
 | 음성 파일 저장 | ✅ 저장 안함 | 텍스트 변환 후 삭제 |
+
+---
+
+## 11. 배포 현황
+
+| 플랫폼 | 상태 | URL |
+|--------|------|-----|
+| Web | ✅ 운영 중 | https://voice-diary-eta.vercel.app |
+| GitHub | ✅ 운영 중 | https://github.com/a-teal/voice-diary |
+| iOS | 🔄 개발 중 | Xcode 프로젝트 생성됨 |
+| Android | 🔄 개발 중 | Android Studio 프로젝트 생성됨 |

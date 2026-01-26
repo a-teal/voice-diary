@@ -24,7 +24,7 @@ Project Dairy/
 
 ## 기술 스택
 
-- **프레임워크**: Next.js 16 (App Router)
+- **프레임워크**: Next.js 15.3.4 (App Router)
 - **언어**: TypeScript
 - **스타일링**: Tailwind CSS
 - **UI 라이브러리**:
