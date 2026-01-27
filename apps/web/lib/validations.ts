@@ -21,19 +21,24 @@ export function sanitizeTranscript(text: string): string {
     .replace(/on\w+=/gi, ''); // Remove event handlers
 }
 
-export function validateTranscript(transcript: unknown): { valid: boolean; error?: string } {
+export type ValidationErrorKey =
+  | 'errors.textRequired'
+  | 'errors.textTooShort'
+  | 'errors.textTooLong';
+
+export function validateTranscript(transcript: unknown): { valid: boolean; errorKey?: ValidationErrorKey } {
   if (!transcript || typeof transcript !== 'string') {
-    return { valid: false, error: '텍스트가 필요합니다.' };
+    return { valid: false, errorKey: 'errors.textRequired' };
   }
 
   const trimmed = transcript.trim();
 
   if (trimmed.length < 5) {
-    return { valid: false, error: '텍스트가 너무 짧습니다. (최소 5자)' };
+    return { valid: false, errorKey: 'errors.textTooShort' };
   }
 
   if (trimmed.length > 10000) {
-    return { valid: false, error: '텍스트가 너무 깁니다. (최대 10000자)' };
+    return { valid: false, errorKey: 'errors.textTooLong' };
   }
 
   return { valid: true };

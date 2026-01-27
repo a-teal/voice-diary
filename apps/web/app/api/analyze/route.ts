@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
 
     if (!validation.valid) {
       return NextResponse.json(
-        { error: validation.error },
+        { errorKey: validation.errorKey },
         { status: 400 }
       );
     }

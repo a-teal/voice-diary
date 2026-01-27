@@ -43,11 +43,20 @@ interface SpeechRecognitionInstance {
   abort: () => void;
 }
 
+// Error keys for i18n
+export type VoiceRecorderErrorKey =
+  | 'errors.browserNotSupported'
+  | 'errors.micPermission'
+  | 'errors.noSpeech'
+  | 'errors.recognitionError'
+  | 'errors.deviceNotSupported'
+  | 'errors.cannotStart';
+
 interface UseVoiceRecorderReturn {
   status: RecordingStatus;
   transcript: string;
   isSupported: boolean;
-  error: string | null;
+  errorKey: VoiceRecorderErrorKey | null;
   startRecording: () => void;
   stopRecording: () => void;
   resetRecording: () => void;
@@ -57,7 +66,7 @@ export function useVoiceRecorder(): UseVoiceRecorderReturn {
   const [status, setStatus] = useState<RecordingStatus>('idle');
   const [transcript, setTranscript] = useState('');
   const [isSupported, setIsSupported] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [errorKey, setErrorKey] = useState<VoiceRecorderErrorKey | null>(null);
   const [isNative, setIsNative] = useState(false);
 
   const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
@@ -76,12 +85,14 @@ export function useVoiceRecorder(): UseVoiceRecorderReturn {
     const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognitionAPI) {
       setIsSupported(false);
-      setError('이 브라우저는 음성 인식을 지원하지 않습니다.');
+      setErrorKey('errors.browserNotSupported');
       return;
     }
 
     const recognition = new SpeechRecognitionAPI();
-    recognition.lang = 'ko-KR';
+    // Use browser's language for speech recognition
+    const browserLang = typeof navigator !== 'undefined' ? navigator.language : 'en-US';
+    recognition.lang = browserLang;
     recognition.continuous = true;
     recognition.interimResults = true;
 
@@ -105,11 +116,11 @@ export function useVoiceRecorder(): UseVoiceRecorderReturn {
     recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
       console.error('Speech recognition error:', event.error);
       if (event.error === 'not-allowed') {
-        setError('마이크 접근 권한이 필요합니다.');
+        setErrorKey('errors.micPermission');
       } else if (event.error === 'no-speech') {
-        setError('음성이 감지되지 않았습니다.');
+        setErrorKey('errors.noSpeech');
       } else {
-        setError('음성 인식 중 오류가 발생했습니다.');
+        setErrorKey('errors.recognitionError');
       }
       setStatus('error');
     };
@@ -133,7 +144,7 @@ export function useVoiceRecorder(): UseVoiceRecorderReturn {
 
   // Native (Capacitor) speech recognition
   const startNativeRecording = useCallback(async () => {
-    setError(null);
+    setErrorKey(null);
     setTranscript('');
     setStatus('recording');
 
@@ -141,7 +152,7 @@ export function useVoiceRecorder(): UseVoiceRecorderReturn {
       // Request permission
       const permissionStatus = await SpeechRecognition.requestPermissions();
       if (permissionStatus.speechRecognition !== 'granted') {
-        setError('마이크 접근 권한이 필요합니다.');
+        setErrorKey('errors.micPermission');
         setStatus('error');
         return;
       }
@@ -149,7 +160,7 @@ export function useVoiceRecorder(): UseVoiceRecorderReturn {
       // Check availability
       const available = await SpeechRecognition.available();
       if (!available.available) {
-        setError('이 기기에서 음성 인식을 지원하지 않습니다.');
+        setErrorKey('errors.deviceNotSupported');
         setStatus('error');
         return;
       }
@@ -161,15 +172,18 @@ export function useVoiceRecorder(): UseVoiceRecorderReturn {
         }
       });
 
+      // Use browser's language for speech recognition
+      const browserLang = typeof navigator !== 'undefined' ? navigator.language : 'en-US';
+
       // Start listening
       await SpeechRecognition.start({
-        language: 'ko-KR',
+        language: browserLang,
         partialResults: true,
         popup: false,
       });
     } catch (err) {
       console.error('Native speech recognition error:', err);
-      setError('음성 인식을 시작할 수 없습니다.');
+      setErrorKey('errors.cannotStart');
       setStatus('error');
     }
   }, []);
@@ -188,7 +202,7 @@ export function useVoiceRecorder(): UseVoiceRecorderReturn {
   const startWebRecording = useCallback(async () => {
     if (!recognitionRef.current) return;
 
-    setError(null);
+    setErrorKey(null);
     finalTranscriptRef.current = '';
     setTranscript('');
     setStatus('recording');
@@ -198,7 +212,7 @@ export function useVoiceRecorder(): UseVoiceRecorderReturn {
       recognitionRef.current.start();
     } catch (err) {
       console.error('Microphone error:', err);
-      setError('마이크 접근 권한이 필요합니다.');
+      setErrorKey('errors.micPermission');
       setStatus('error');
     }
   }, []);
@@ -239,7 +253,7 @@ export function useVoiceRecorder(): UseVoiceRecorderReturn {
     }
     setStatus('idle');
     setTranscript('');
-    setError(null);
+    setErrorKey(null);
     finalTranscriptRef.current = '';
   }, [isNative]);
 
@@ -247,7 +261,7 @@ export function useVoiceRecorder(): UseVoiceRecorderReturn {
     status,
     transcript,
     isSupported,
-    error,
+    errorKey,
     startRecording,
     stopRecording,
     resetRecording,

@@ -7,10 +7,12 @@ import BottomNav from '@/components/layout/BottomNav';
 import { DiaryEntry, Emotion } from '@/types';
 import { getAllEntries } from '@/lib/storage';
 import { EMOTION_MAP, MOOD_VALUES } from '@/constants/emotions';
+import { useTranslation } from '@/lib/i18n';
 
 export default function StatsPage() {
   const [entries, setEntries] = useState<DiaryEntry[]>([]);
   const [period, setPeriod] = useState<7 | 30>(7);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const allEntries = getAllEntries();
@@ -53,21 +55,28 @@ export default function StatsPage() {
   return (
     <div className="flex flex-col min-h-screen bg-slate-50 overflow-y-auto">
       <header className="px-6 pt-12 pb-6 bg-white shadow-sm">
-        <h2 className="text-2xl font-bold text-slate-900 mb-4">Mood Analysis</h2>
+        <h2 className="text-2xl font-bold text-slate-900 mb-4">{t('stats.title')}</h2>
         <div className="flex bg-slate-100 p-1 rounded-xl w-full">
-          {[7, 30].map((p) => (
-            <button
-              key={p}
-              onClick={() => setPeriod(p as 7 | 30)}
-              className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
-                period === p
-                  ? "bg-white text-indigo-600 shadow-sm"
-                  : "text-slate-400 hover:text-slate-600"
-              }`}
-            >
-              Last {p} Days
-            </button>
-          ))}
+          <button
+            onClick={() => setPeriod(7)}
+            className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
+              period === 7
+                ? "bg-white text-indigo-600 shadow-sm"
+                : "text-slate-400 hover:text-slate-600"
+            }`}
+          >
+            {t('stats.last7Days')}
+          </button>
+          <button
+            onClick={() => setPeriod(30)}
+            className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
+              period === 30
+                ? "bg-white text-indigo-600 shadow-sm"
+                : "text-slate-400 hover:text-slate-600"
+            }`}
+          >
+            {t('stats.last30Days')}
+          </button>
         </div>
       </header>
 
@@ -75,16 +84,16 @@ export default function StatsPage() {
         {entries.length === 0 ? (
           <div className="text-center py-20">
             <p className="text-6xl mb-4">📊</p>
-            <p className="text-slate-500">No entries yet</p>
+            <p className="text-slate-500">{t('stats.noEntries')}</p>
             <p className="text-slate-400 text-sm mt-2">
-              Record your first diary to see stats
+              {t('stats.recordFirst')}
             </p>
           </div>
         ) : (
           <>
             {/* Chart */}
             <section className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
-              <h3 className="font-bold text-slate-800 mb-6">Mood Flow</h3>
+              <h3 className="font-bold text-slate-800 mb-6">{t('stats.moodFlow')}</h3>
               <div className="h-64 w-full">
                 {chartData.length > 0 ? (
                   <ResponsiveContainer width="100%" height="100%">
@@ -115,7 +124,7 @@ export default function StatsPage() {
                   </ResponsiveContainer>
                 ) : (
                   <div className="h-full flex items-center justify-center text-slate-400 text-sm">
-                    Not enough data yet
+                    {t('stats.notEnoughData')}
                   </div>
                 )}
               </div>
@@ -124,15 +133,15 @@ export default function StatsPage() {
             {/* Summary Cards */}
             <section className="grid grid-cols-2 gap-4">
               <div className="bg-white p-5 rounded-3xl shadow-sm border border-slate-100">
-                <h4 className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">Entries</h4>
+                <h4 className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">{t('stats.entries')}</h4>
                 <p className="text-3xl font-bold text-slate-900">{filteredEntries.length}</p>
               </div>
               <div className="bg-white p-5 rounded-3xl shadow-sm border border-slate-100">
-                <h4 className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">Top Mood</h4>
+                <h4 className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">{t('stats.topMood')}</h4>
                 {mostFrequentMood ? (
                   <div className="flex items-center gap-2">
                     <span className="text-2xl">{mostFrequentMood.emoji}</span>
-                    <span className="font-semibold text-slate-700">{mostFrequentMood.label}</span>
+                    <span className="font-semibold text-slate-700">{t(`emotions.${Object.keys(EMOTION_MAP).find(k => EMOTION_MAP[k as Emotion].emoji === mostFrequentMood.emoji)}`)}</span>
                   </div>
                 ) : (
                   <span className="text-slate-300">-</span>
@@ -142,7 +151,7 @@ export default function StatsPage() {
 
             {/* Keyword Cloud */}
             <section>
-              <h3 className="font-bold text-slate-800 mb-4">Top Topics</h3>
+              <h3 className="font-bold text-slate-800 mb-4">{t('stats.topTopics')}</h3>
               <div className="flex flex-wrap gap-2">
                 {keywordCounts.length > 0 ? (
                   keywordCounts.slice(0, 10).map(([word, count], i) => (
@@ -159,7 +168,7 @@ export default function StatsPage() {
                     </span>
                   ))
                 ) : (
-                  <p className="text-slate-400 text-sm italic">No keywords analyzed yet</p>
+                  <p className="text-slate-400 text-sm italic">{t('stats.noKeywords')}</p>
                 )}
               </div>
             </section>

@@ -6,6 +6,7 @@ import { Mic, Square, X, Loader2, Check } from 'lucide-react';
 import { useVoiceRecorder } from '@/hooks/useVoiceRecorder';
 import { AnalysisResult, DiaryEntry } from '@/types';
 import { saveEntry, generateId } from '@/lib/storage';
+import { useTranslation } from '@/lib/i18n';
 
 interface RecordingModalProps {
   isOpen: boolean;
@@ -20,11 +21,12 @@ export default function RecordingModal({ isOpen, onClose, onSaved }: RecordingMo
     status,
     transcript,
     isSupported,
-    error,
+    errorKey,
     startRecording,
     stopRecording,
     resetRecording,
   } = useVoiceRecorder();
+  const { t } = useTranslation();
 
   const [state, setState] = useState<RecordingState>('idle');
   const [recordingTime, setRecordingTime] = useState(0);
@@ -159,7 +161,7 @@ export default function RecordingModal({ isOpen, onClose, onSaved }: RecordingMo
           >
             {/* Header */}
             <div className="flex justify-between items-center mb-8">
-              <h3 className="text-lg font-semibold text-slate-900">Today&apos;s Entry</h3>
+              <h3 className="text-lg font-semibold text-slate-900">{t('recorder.title')}</h3>
               <button
                 onClick={handleClose}
                 className="p-2 bg-slate-100 rounded-full hover:bg-slate-200 transition-colors"
@@ -171,9 +173,9 @@ export default function RecordingModal({ isOpen, onClose, onSaved }: RecordingMo
             {/* Browser not supported */}
             {!isSupported && (
               <div className="flex-1 flex flex-col items-center justify-center text-center">
-                <p className="text-red-500">{error}</p>
+                <p className="text-red-500">{errorKey ? t(errorKey) : ''}</p>
                 <p className="text-slate-500 text-sm mt-2">
-                  Please use Chrome, Safari, or Edge browser.
+                  {t('recorder.browserNotSupported')}
                 </p>
               </div>
             )}
@@ -186,7 +188,7 @@ export default function RecordingModal({ isOpen, onClose, onSaved }: RecordingMo
                     <div className="w-20 h-20 bg-indigo-50 rounded-full flex items-center justify-center mx-auto">
                       <Mic className="w-8 h-8 text-indigo-500" />
                     </div>
-                    <p className="text-slate-500">Tap to start recording</p>
+                    <p className="text-slate-500">{t('recorder.tapToStart')}</p>
                   </div>
                 )}
 
@@ -214,7 +216,7 @@ export default function RecordingModal({ isOpen, onClose, onSaved }: RecordingMo
                       </div>
                     )}
 
-                    <p className="text-slate-400 text-sm animate-pulse">Listening...</p>
+                    <p className="text-slate-400 text-sm animate-pulse">{t('recorder.listening')}</p>
                   </div>
                 )}
 
@@ -224,7 +226,7 @@ export default function RecordingModal({ isOpen, onClose, onSaved }: RecordingMo
                       <Loader2 className="w-10 h-10 text-indigo-600 animate-spin" />
                     </div>
                     <p className="text-indigo-600 font-medium animate-pulse">
-                      AI is analyzing your mood...
+                      {t('recorder.analyzing')}
                     </p>
                   </div>
                 )}
@@ -239,9 +241,9 @@ export default function RecordingModal({ isOpen, onClose, onSaved }: RecordingMo
                       <Check className="w-10 h-10 text-green-600" />
                     </motion.div>
                     <div>
-                      <h4 className="text-xl font-bold text-slate-800">Ready to save!</h4>
+                      <h4 className="text-xl font-bold text-slate-800">{t('recorder.ready')}</h4>
                       <p className="text-slate-500 text-sm mt-1">
-                        Duration: {formatDuration(recordingTime)}
+                        {t('recorder.duration')}: {formatDuration(recordingTime)}
                       </p>
                     </div>
                   </div>
@@ -257,7 +259,7 @@ export default function RecordingModal({ isOpen, onClose, onSaved }: RecordingMo
                     onClick={handleStartRecording}
                     className="w-full bg-indigo-600 text-white py-4 rounded-xl font-semibold shadow-lg shadow-indigo-200 hover:bg-indigo-700 active:scale-95 transition-all"
                   >
-                    Start Recording
+                    {t('recorder.start')}
                   </button>
                 )}
 
@@ -267,7 +269,7 @@ export default function RecordingModal({ isOpen, onClose, onSaved }: RecordingMo
                     className="w-full bg-slate-900 text-white py-4 rounded-xl font-semibold shadow-lg hover:bg-black active:scale-95 transition-all flex items-center justify-center gap-2"
                   >
                     <Square className="w-5 h-5 fill-current" />
-                    Stop Recording
+                    {t('recorder.stop')}
                   </button>
                 )}
 
@@ -276,15 +278,15 @@ export default function RecordingModal({ isOpen, onClose, onSaved }: RecordingMo
                     onClick={handleSave}
                     className="w-full bg-indigo-600 text-white py-4 rounded-xl font-semibold shadow-lg shadow-indigo-200 hover:bg-indigo-700 active:scale-95 transition-all"
                   >
-                    Save Entry
+                    {t('recorder.save')}
                   </button>
                 )}
               </div>
             )}
 
             {/* Error message */}
-            {error && state !== 'idle' && (
-              <p className="text-red-500 text-sm text-center mt-4">{error}</p>
+            {errorKey && state !== 'idle' && (
+              <p className="text-red-500 text-sm text-center mt-4">{t(errorKey)}</p>
             )}
           </motion.div>
         </>

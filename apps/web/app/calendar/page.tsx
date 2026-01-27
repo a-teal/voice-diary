@@ -3,17 +3,20 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, getDay } from 'date-fns';
-import { ko } from 'date-fns/locale';
+import { ko, enUS } from 'date-fns/locale';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import BottomNav from '@/components/layout/BottomNav';
 import { DiaryEntry } from '@/types';
 import { getEntriesByMonth } from '@/lib/storage';
 import { EMOTION_MAP } from '@/constants/emotions';
+import { useTranslation } from '@/lib/i18n';
 
 export default function CalendarPage() {
   const router = useRouter();
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [entries, setEntries] = useState<DiaryEntry[]>([]);
+  const { t, locale } = useTranslation();
+  const dateLocale = locale === 'ko' ? ko : enUS;
 
   const year = currentMonth.getFullYear();
   const month = currentMonth.getMonth() + 1;
@@ -51,7 +54,7 @@ export default function CalendarPage() {
           <ChevronLeft className="w-5 h-5 text-slate-600" />
         </button>
         <h2 className="text-xl font-bold text-slate-900">
-          {format(currentMonth, "yyyy년 M월", { locale: ko })}
+          {format(currentMonth, locale === 'ko' ? "yyyy년 M월" : "MMMM yyyy", { locale: dateLocale })}
         </h2>
         <button
           onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
@@ -65,9 +68,9 @@ export default function CalendarPage() {
       <div className="flex-1 p-4 overflow-y-auto pb-24">
         {/* Weekdays */}
         <div className="grid grid-cols-7 mb-4">
-          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+          {['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'].map(day => (
             <div key={day} className="text-center text-xs font-semibold text-slate-400 uppercase tracking-wider">
-              {day}
+              {t(`calendar.weekdays.${day}`)}
             </div>
           ))}
         </div>
@@ -110,11 +113,11 @@ export default function CalendarPage() {
 
         {/* Stats summary */}
         <div className="mt-6 bg-white rounded-2xl shadow-sm border border-slate-100 p-4">
-          <h3 className="text-sm font-medium text-slate-500 mb-3">Monthly Summary</h3>
+          <h3 className="text-sm font-medium text-slate-500 mb-3">{t('calendar.monthlySummary')}</h3>
           <div className="flex items-center gap-4">
             <div className="text-center">
               <p className="text-2xl font-bold text-indigo-600">{entries.length}</p>
-              <p className="text-xs text-slate-500">Entries</p>
+              <p className="text-xs text-slate-500">{t('calendar.entries')}</p>
             </div>
             <div className="flex-1 flex flex-wrap gap-1">
               {entries.map((entry) => (

@@ -10,12 +10,14 @@ import RecordingModal from '@/components/recorder/RecordingModal';
 import { DiaryEntry } from '@/types';
 import { getEntryByDate } from '@/lib/storage';
 import { useSwipe } from '@/hooks/useSwipe';
+import { useTranslation } from '@/lib/i18n';
 
 export default function Home() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [entry, setEntry] = useState<DiaryEntry | null>(null);
   const [isRecordingOpen, setIsRecordingOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const { t } = useTranslation();
 
   const dateString = currentDate.toISOString().split('T')[0];
 
@@ -86,12 +88,10 @@ export default function Home() {
             </div>
             <div>
               <h3 className="text-xl font-bold text-slate-800">
-                {isToday ? 'No memories yet' : 'No entry for this day'}
+                {isToday ? t('home.noMemories') : t('home.noEntry')}
               </h3>
               <p className="text-slate-500 text-sm mt-2 max-w-[200px] mx-auto">
-                {isToday
-                  ? 'Capture your day with your voice. Tap the button below.'
-                  : 'There is no diary entry for this date.'}
+                {isToday ? t('home.captureDay') : t('home.noEntryDesc')}
               </p>
             </div>
           </div>
@@ -105,7 +105,7 @@ export default function Home() {
           whileTap={{ scale: 0.95 }}
           onClick={() => setIsRecordingOpen(true)}
           className="fixed bottom-24 right-6 w-14 h-14 bg-indigo-600 text-white rounded-full shadow-xl shadow-indigo-300 flex items-center justify-center z-20"
-          aria-label="녹음 시작"
+          aria-label={t('home.startRecording')}
         >
           <Mic className="w-7 h-7" />
         </motion.button>

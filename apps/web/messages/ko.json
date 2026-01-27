@@ -1,0 +1,79 @@
+{
+  "nav": {
+    "home": "홈",
+    "calendar": "캘린더",
+    "stats": "통계"
+  },
+  "home": {
+    "noMemories": "아직 기록이 없습니다",
+    "noEntry": "이 날의 기록이 없습니다",
+    "captureDay": "음성으로 하루를 기록해보세요.",
+    "noEntryDesc": "이 날짜의 일기가 없습니다.",
+    "startRecording": "녹음 시작"
+  },
+  "recorder": {
+    "title": "오늘의 기록",
+    "tapToStart": "탭하여 녹음 시작",
+    "listening": "듣는 중...",
+    "analyzing": "AI가 감정을 분석하고 있어요...",
+    "ready": "저장 준비 완료!",
+    "duration": "녹음 시간",
+    "start": "녹음 시작",
+    "stop": "녹음 중지",
+    "save": "저장",
+    "browserNotSupported": "Chrome, Safari, Edge 브라우저를 사용해주세요."
+  },
+  "calendar": {
+    "weekdays": {
+      "sun": "일",
+      "mon": "월",
+      "tue": "화",
+      "wed": "수",
+      "thu": "목",
+      "fri": "금",
+      "sat": "토"
+    },
+    "monthlySummary": "월간 요약",
+    "entries": "기록"
+  },
+  "stats": {
+    "title": "감정 분석",
+    "last7Days": "최근 7일",
+    "last30Days": "최근 30일",
+    "noEntries": "아직 기록이 없습니다",
+    "recordFirst": "첫 일기를 기록하고 통계를 확인해보세요",
+    "moodFlow": "감정 흐름",
+    "notEnoughData": "데이터가 충분하지 않습니다",
+    "entries": "기록",
+    "topMood": "주요 감정",
+    "topTopics": "주요 키워드",
+    "noKeywords": "분석된 키워드가 없습니다"
+  },
+  "emotions": {
+    "happy": "행복",
+    "sad": "슬픔",
+    "angry": "화남",
+    "anxious": "불안",
+    "peaceful": "평온",
+    "tired": "피곤",
+    "thinking": "생각",
+    "confident": "자신감",
+    "love": "사랑",
+    "neutral": "보통"
+  },
+  "errors": {
+    "browserNotSupported": "이 브라우저는 음성 인식을 지원하지 않습니다.",
+    "micPermission": "마이크 접근 권한이 필요합니다.",
+    "noSpeech": "음성이 감지되지 않았습니다.",
+    "recognitionError": "음성 인식 중 오류가 발생했습니다.",
+    "deviceNotSupported": "이 기기에서 음성 인식을 지원하지 않습니다.",
+    "cannotStart": "음성 인식을 시작할 수 없습니다.",
+    "textRequired": "텍스트가 필요합니다.",
+    "textTooShort": "텍스트가 너무 짧습니다. (최소 5자)",
+    "textTooLong": "텍스트가 너무 깁니다. (최대 10000자)"
+  },
+  "common": {
+    "prevDate": "이전 날짜",
+    "nextDate": "다음 날짜"
+  }
+}

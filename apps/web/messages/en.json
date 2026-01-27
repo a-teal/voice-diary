@@ -1,0 +1,79 @@
+{
+  "nav": {
+    "home": "Home",
+    "calendar": "Calendar",
+    "stats": "Stats"
+  },
+  "home": {
+    "noMemories": "No memories yet",
+    "noEntry": "No entry for this day",
+    "captureDay": "Capture your day with your voice. Tap the button below.",
+    "noEntryDesc": "There is no diary entry for this date.",
+    "startRecording": "Start recording"
+  },
+  "recorder": {
+    "title": "Today's Entry",
+    "tapToStart": "Tap to start recording",
+    "listening": "Listening...",
+    "analyzing": "AI is analyzing your mood...",
+    "ready": "Ready to save!",
+    "duration": "Duration",
+    "start": "Start Recording",
+    "stop": "Stop Recording",
+    "save": "Save Entry",
+    "browserNotSupported": "Please use Chrome, Safari, or Edge browser."
+  },
+  "calendar": {
+    "weekdays": {
+      "sun": "Sun",
+      "mon": "Mon",
+      "tue": "Tue",
+      "wed": "Wed",
+      "thu": "Thu",
+      "fri": "Fri",
+      "sat": "Sat"
+    },
+    "monthlySummary": "Monthly Summary",
+    "entries": "Entries"
+  },
+  "stats": {
+    "title": "Mood Analysis",
+    "last7Days": "Last 7 Days",
+    "last30Days": "Last 30 Days",
+    "noEntries": "No entries yet",
+    "recordFirst": "Record your first diary to see stats",
+    "moodFlow": "Mood Flow",
+    "notEnoughData": "Not enough data yet",
+    "entries": "Entries",
+    "topMood": "Top Mood",
+    "topTopics": "Top Topics",
+    "noKeywords": "No keywords analyzed yet"
+  },
+  "emotions": {
+    "happy": "Happy",
+    "sad": "Sad",
+    "angry": "Angry",
+    "anxious": "Anxious",
+    "peaceful": "Peaceful",
+    "tired": "Tired",
+    "thinking": "Thinking",
+    "confident": "Confident",
+    "love": "Love",
+    "neutral": "Neutral"
+  },
+  "errors": {
+    "browserNotSupported": "This browser does not support speech recognition.",
+    "micPermission": "Microphone permission is required.",
+    "noSpeech": "No speech detected.",
+    "recognitionError": "An error occurred during speech recognition.",
+    "deviceNotSupported": "This device does not support speech recognition.",
+    "cannotStart": "Cannot start speech recognition.",
+    "textRequired": "Text is required.",
+    "textTooShort": "Text is too short. (minimum 5 characters)",
+    "textTooLong": "Text is too long. (maximum 10000 characters)"
+  },
+  "common": {
+    "prevDate": "Previous date",
+    "nextDate": "Next date"
+  }
+}

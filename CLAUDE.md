@@ -39,6 +39,7 @@ Project Dairy/
   - 네이티브: @capacitor-community/speech-recognition
 - **저장소**: localStorage (로컬 저장)
 - **모바일**: Capacitor (iOS/Android)
+- **다국어**: Custom i18n (React Context 기반)
 
 ## Web 앱 구조 (apps/web)
 
@@ -56,6 +57,10 @@ apps/web/
 │   └── stats/             # EmotionChart, KeywordCloud
 ├── hooks/                 # 커스텀 훅 (useVoiceRecorder, useSwipe)
 ├── lib/                   # 유틸리티
+│   └── i18n.tsx           # 다국어 지원 (Context + Hook)
+├── messages/              # 번역 파일
+│   ├── en.json            # 영어 (기본)
+│   └── ko.json            # 한국어
 ├── types/                 # TypeScript 타입
 ├── constants/             # 상수 (감정 이모지 등)
 ├── __tests__/             # 테스트
@@ -147,6 +152,40 @@ interface DiaryEntry {
 - **카드**: `rounded-2xl shadow-sm border border-slate-100`
 - **버튼**: `rounded-xl` (primary: bg-indigo-600)
 - **아이콘**: lucide-react 사용
+
+## 다국어 지원 (i18n)
+
+### 지원 언어
+- 영어 (en) - 기본값
+- 한국어 (ko)
+
+### 작동 방식
+1. 브라우저 언어 자동 감지 (`navigator.language`)
+2. 지원 언어가 있으면 해당 언어로 표시
+3. 지원 언어가 없으면 영어(fallback)로 표시
+4. localStorage에 사용자 선호 언어 저장
+
+### 번역 파일 구조
+```
+messages/
+├── en.json    # 영어 (기본)
+└── ko.json    # 한국어
+```
+
+### 사용법
+```tsx
+import { useTranslation } from '@/lib/i18n';
+
+function Component() {
+  const { t, locale } = useTranslation();
+  return <p>{t('home.noMemories')}</p>;
+}
+```
+
+### 새 언어 추가
+1. `messages/` 폴더에 새 JSON 파일 추가 (예: `ja.json`)
+2. `lib/i18n.tsx`의 `SUPPORTED_LOCALES`에 추가
+3. `messages` 객체에 import 추가
 
 ## 참고 문서
 
