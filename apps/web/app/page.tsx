@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { Mic } from 'lucide-react';
 import Header from '@/components/layout/Header';
+import MicPencilIcon from '@/components/icons/MicPencilIcon';
 import BottomNav from '@/components/layout/BottomNav';
 import EntryCard from '@/components/diary/EntryCard';
 import RecordingModal from '@/components/recorder/RecordingModal';
@@ -107,7 +107,7 @@ export default function Home() {
           className="fixed bottom-24 right-6 w-14 h-14 bg-indigo-600 text-white rounded-full shadow-xl shadow-indigo-300 flex items-center justify-center z-20"
           aria-label={t('home.startRecording')}
         >
-          <Mic className="w-7 h-7" />
+          <MicPencilIcon size={32} />
         </motion.button>
       )}
 

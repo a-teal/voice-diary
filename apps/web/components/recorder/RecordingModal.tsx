@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mic, Square, X, Loader2, Check } from 'lucide-react';
+import { Square, X, Loader2, Check } from 'lucide-react';
 import { useVoiceRecorder } from '@/hooks/useVoiceRecorder';
+import MicPencilIcon from '@/components/icons/MicPencilIcon';
 import { AnalysisResult, DiaryEntry } from '@/types';
 import { saveEntry, generateId } from '@/lib/storage';
 import { useTranslation } from '@/lib/i18n';
@@ -186,7 +187,7 @@ export default function RecordingModal({ isOpen, onClose, onSaved }: RecordingMo
                 {state === 'idle' && (
                   <div className="text-center space-y-4">
                     <div className="w-20 h-20 bg-indigo-50 rounded-full flex items-center justify-center mx-auto">
-                      <Mic className="w-8 h-8 text-indigo-500" />
+                      <MicPencilIcon size={40} className="text-indigo-500" />
                     </div>
                     <p className="text-slate-500">{t('recorder.tapToStart')}</p>
                   </div>
@@ -201,7 +202,7 @@ export default function RecordingModal({ isOpen, onClose, onSaved }: RecordingMo
                         className="absolute inset-0 bg-red-500 rounded-full"
                       />
                       <div className="relative bg-red-500 w-16 h-16 rounded-full flex items-center justify-center shadow-lg shadow-red-200">
-                        <Mic className="w-8 h-8 text-white" />
+                        <MicPencilIcon size={32} className="text-white" />
                       </div>
                     </div>
 
