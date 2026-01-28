@@ -16,21 +16,21 @@ export default function MicPencilIcon({ className = '', size = 24 }: MicPencilIc
       className={className}
     >
       {/* Rotated Microphone-Pencil */}
-      <g transform="translate(50, 50) rotate(-25) translate(-30, -45)">
+      <g transform="translate(50, 47) rotate(-35) translate(-16, -32)">
         {/* Microphone Head (pill shape) */}
-        <rect x="15" y="0" width="30" height="40" rx="15" fill="currentColor"/>
+        <rect x="6" y="0" width="20" height="26" rx="10" fill="currentColor"/>
 
         {/* Microphone Ring */}
-        <ellipse cx="30" cy="46" rx="14" ry="6" fill="none" stroke="white" strokeOpacity="0.5" strokeWidth="3"/>
+        <ellipse cx="16" cy="29" rx="8.5" ry="3.2" fill="none" stroke="white" strokeOpacity="0.8" strokeWidth="1.6"/>
 
         {/* Pencil Body */}
-        <path d="M16 46 L10 85 L30 95 L50 85 L44 46 Z" fill="currentColor"/>
+        <path d="M7.5 29 L4 60 L16 72 L28 60 L24.5 29 Z" fill="currentColor"/>
 
         {/* Pencil Tip */}
-        <path d="M10 85 L30 105 L50 85 Z" fill="currentColor"/>
+        <path d="M4 60 L16 78 L28 60 Z" fill="currentColor"/>
 
         {/* Pencil Tip (white inner) */}
-        <path d="M22 92 L30 105 L38 92 Z" fill="white" fillOpacity="0.9"/>
+        <path d="M11 66 L16 78 L21 66 Z" fill="white" fillOpacity="0.95"/>
       </g>
     </svg>
   );
