@@ -8,7 +8,7 @@ import BottomNav from '@/components/layout/BottomNav';
 import EntryCard from '@/components/diary/EntryCard';
 import RecordingModal from '@/components/recorder/RecordingModal';
 import { DiaryEntry } from '@/types';
-import { getEntryByDate } from '@/lib/storage';
+import { getEntryByDate, getLocalDateString } from '@/lib/storage';
 import { useSwipe } from '@/hooks/useSwipe';
 import { useTranslation } from '@/lib/i18n';
 
@@ -19,7 +19,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const { t } = useTranslation();
 
-  const dateString = currentDate.toISOString().split('T')[0];
+  const dateString = getLocalDateString(currentDate);
 
   const loadEntry = useCallback(() => {
     setIsLoading(true);

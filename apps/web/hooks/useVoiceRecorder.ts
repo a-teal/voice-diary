@@ -71,6 +71,7 @@ export function useVoiceRecorder(): UseVoiceRecorderReturn {
 
   const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
   const finalTranscriptRef = useRef('');
+  const isRecordingRef = useRef(false);
 
   // Check platform
   useEffect(() => {
@@ -126,7 +127,8 @@ export function useVoiceRecorder(): UseVoiceRecorderReturn {
     };
 
     recognition.onend = () => {
-      if (status === 'recording') {
+      // Use ref to avoid stale closure issue
+      if (isRecordingRef.current) {
         try {
           recognition.start();
         } catch {
@@ -147,6 +149,7 @@ export function useVoiceRecorder(): UseVoiceRecorderReturn {
     setErrorKey(null);
     setTranscript('');
     setStatus('recording');
+    isRecordingRef.current = true;
 
     try {
       // Request permission
@@ -154,6 +157,7 @@ export function useVoiceRecorder(): UseVoiceRecorderReturn {
       if (permissionStatus.speechRecognition !== 'granted') {
         setErrorKey('errors.micPermission');
         setStatus('error');
+        isRecordingRef.current = false;
         return;
       }
 
@@ -162,6 +166,7 @@ export function useVoiceRecorder(): UseVoiceRecorderReturn {
       if (!available.available) {
         setErrorKey('errors.deviceNotSupported');
         setStatus('error');
+        isRecordingRef.current = false;
         return;
       }
 
@@ -185,10 +190,12 @@ export function useVoiceRecorder(): UseVoiceRecorderReturn {
       console.error('Native speech recognition error:', err);
       setErrorKey('errors.cannotStart');
       setStatus('error');
+      isRecordingRef.current = false;
     }
   }, []);
 
   const stopNativeRecording = useCallback(async () => {
+    isRecordingRef.current = false;
     try {
       await SpeechRecognition.stop();
       await SpeechRecognition.removeAllListeners();
@@ -206,6 +213,7 @@ export function useVoiceRecorder(): UseVoiceRecorderReturn {
     finalTranscriptRef.current = '';
     setTranscript('');
     setStatus('recording');
+    isRecordingRef.current = true;
 
     try {
       await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -214,11 +222,13 @@ export function useVoiceRecorder(): UseVoiceRecorderReturn {
       console.error('Microphone error:', err);
       setErrorKey('errors.micPermission');
       setStatus('error');
+      isRecordingRef.current = false;
     }
   }, []);
 
   const stopWebRecording = useCallback(() => {
     if (!recognitionRef.current) return;
+    isRecordingRef.current = false;
     recognitionRef.current.stop();
     setStatus('idle');
   }, []);
@@ -241,6 +251,7 @@ export function useVoiceRecorder(): UseVoiceRecorderReturn {
   }, [isNative, stopNativeRecording, stopWebRecording]);
 
   const resetRecording = useCallback(async () => {
+    isRecordingRef.current = false;
     if (isNative) {
       try {
         await SpeechRecognition.stop();

@@ -6,7 +6,7 @@ import { Square, X, Loader2, Check } from 'lucide-react';
 import { useVoiceRecorder } from '@/hooks/useVoiceRecorder';
 import MicPencilIcon from '@/components/icons/MicPencilIcon';
 import { AnalysisResult, DiaryEntry } from '@/types';
-import { saveEntry, generateId } from '@/lib/storage';
+import { saveEntry, generateId, getLocalDateString } from '@/lib/storage';
 import { useTranslation } from '@/lib/i18n';
 
 interface RecordingModalProps {
@@ -116,7 +116,7 @@ export default function RecordingModal({ isOpen, onClose, onSaved }: RecordingMo
     const now = new Date();
     const entry: DiaryEntry = {
       id: generateId(),
-      date: now.toISOString().split('T')[0],
+      date: getLocalDateString(now),
       createdAt: now.toISOString(),
       transcript,
       keywords: analysisResult.keywords,

@@ -12,6 +12,7 @@ import {
 } from 'recharts';
 import { DiaryEntry, Emotion } from '@/types';
 import { EMOTION_MAP } from '@/constants/emotions';
+import { getLocalDateString } from '@/lib/storage';
 
 interface EmotionChartProps {
   entries: DiaryEntry[];
@@ -40,7 +41,7 @@ export default function EmotionChart({ entries, days = 7 }: EmotionChartProps) {
     for (let i = days - 1; i >= 0; i--) {
       const date = new Date(today);
       date.setDate(date.getDate() - i);
-      const dateStr = date.toISOString().split('T')[0];
+      const dateStr = getLocalDateString(date);
 
       const entry = entries.find((e) => e.date === dateStr);
 
