@@ -67,6 +67,7 @@ export default function RecordingModal({ isOpen, onClose, onSaved }: RecordingMo
   };
 
   const handleStartRecording = () => {
+    console.log('[RecordingModal] handleStartRecording called');
     resetRecording();
     setRecordingTime(0);
     startRecording();

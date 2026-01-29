@@ -258,6 +258,7 @@ export function useVoiceRecorder(): UseVoiceRecorderReturn {
 
   // Unified interface
   const startRecording = useCallback(() => {
+    console.log('[STT] startRecording called, isNative:', isNative);
     if (isNative) {
       startNativeRecording();
     } else {
