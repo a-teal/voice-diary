@@ -176,7 +176,7 @@ full: 9999px (pill, circle)
 
 ## 4. 아이콘 필요 목록
 
-- 마이크 (녹음)
+- 마이크+연필 (MicPencilIcon) - 커스텀 브랜드 아이콘 ✅
 - 정지 (녹음 중지)
 - 체크 (완료)
 - X (닫기)
@@ -185,6 +185,16 @@ full: 9999px (pill, circle)
 - 차트/통계
 - 화살표 좌/우
 - 펼치기/접기
+
+### 4.1 브랜드 아이콘 (MicPencilIcon)
+- **위치**: `components/icons/MicPencilIcon.tsx`
+- **컨셉**: 마이크 + 연필 결합 (음성 + 기록)
+- **사용처**:
+  - FAB 녹음 버튼
+  - 녹음 모달 아이콘
+  - 앱 아이콘 (192x192, 512x512)
+- **색상**: currentColor (부모 요소의 text 색상 상속)
+- **배경**: 검정 (#000000) - 앱 아이콘용
 
 ---
 
@@ -251,8 +261,32 @@ full: 9999px (pill, circle)
 
 ---
 
+---
+
+## 10. 다국어 지원 (i18n)
+
+### 지원 언어
+- 영어 (en) - 기본값
+- 한국어 (ko)
+
+### 작동 방식
+1. 브라우저 언어 자동 감지 (`navigator.language`)
+2. 지원 언어 있으면 해당 언어 표시
+3. 없으면 영어 (fallback)
+
+### 번역 파일 위치
+```
+apps/web/messages/
+├── en.json
+└── ko.json
+```
+
+---
+
 ## 참고
 
 - 현재 앱: https://voice-diary-eta.vercel.app
 - 기술 스택: Next.js 15.3.4, React 19, Tailwind CSS v4
 - 디자인 적용 완료 (2025-01-27)
+- 다국어 지원 추가 (2025-01-29)
+- 새 로고 적용 (2025-01-29)

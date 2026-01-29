@@ -114,6 +114,22 @@
   - CalendarView (date-fns, 새 그리드)
   - StatsView (Recharts 차트, 새 레이아웃)
 
+### 3.5 다국어 지원 (i18n) ✅
+- [x] i18n 시스템 구현 (React Context)
+- [x] 번역 파일 생성
+  - messages/en.json (영어 - 기본)
+  - messages/ko.json (한국어)
+- [x] 브라우저 언어 자동 감지
+- [x] 모든 UI 컴포넌트 번역 적용
+- [x] 음성 인식 언어 자동 설정
+
+### 3.6 브랜드 아이덴티티 ✅
+- [x] 새 로고 디자인 (마이크+연필)
+- [x] 앱 아이콘 업데이트 (192x192, 512x512)
+- [x] MicPencilIcon 컴포넌트 생성
+- [x] FAB 버튼 아이콘 적용
+- [x] 녹음 모달 아이콘 적용
+
 ---
 
 ## Phase 4: 고도화 (예정)
