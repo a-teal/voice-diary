@@ -1,34 +1,37 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import Header from '@/components/layout/Header';
 import BottomNav from '@/components/layout/BottomNav';
 import EntryCard from '@/components/diary/EntryCard';
 import RecordingModal from '@/components/recorder/RecordingModal';
 import { DiaryEntry } from '@/types';
-import { getEntryByDate } from '@/lib/storage';
+import { getEntriesByDate } from '@/lib/storage';
 import { useSwipe } from '@/hooks/useSwipe';
+import { EMOTION_MAP } from '@/constants/emotions';
+import { format } from 'date-fns';
 
 export default function Home() {
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [entry, setEntry] = useState<DiaryEntry | null>(null);
+  const [entries, setEntries] = useState<DiaryEntry[]>([]);
   const [isRecordingOpen, setIsRecordingOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedEntry, setSelectedEntry] = useState<DiaryEntry | null>(null);
 
   const dateString = currentDate.toISOString().split('T')[0];
 
-  const loadEntry = useCallback(() => {
+  const loadEntries = useCallback(() => {
     setIsLoading(true);
-    const savedEntry = getEntryByDate(dateString);
-    setEntry(savedEntry);
+    const savedEntries = getEntriesByDate(dateString);
+    setEntries(savedEntries);
     setIsLoading(false);
   }, [dateString]);
 
   useEffect(() => {
-    loadEntry();
-  }, [loadEntry]);
+    loadEntries();
+  }, [loadEntries]);
 
   const handlePrevDate = useCallback(() => {
     const newDate = new Date(currentDate);
@@ -51,7 +54,7 @@ export default function Home() {
   });
 
   const handleSaved = (newEntry: DiaryEntry) => {
-    setEntry(newEntry);
+    setEntries(prev => [newEntry, ...prev]);
     setCurrentDate(new Date());
   };
 
@@ -74,8 +77,37 @@ export default function Home() {
           <div className="flex justify-center py-20">
             <div className="w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin" />
           </div>
-        ) : entry ? (
-          <EntryCard entry={entry} />
+        ) : entries.length > 0 ? (
+          <div className="space-y-4">
+            {/* Emotion summary for the day */}
+            <div className="flex gap-2 overflow-x-auto pb-2">
+              {entries.map((entry) => (
+                <button
+                  key={entry.id}
+                  onClick={() => setSelectedEntry(selectedEntry?.id === entry.id ? null : entry)}
+                  className={`flex-shrink-0 flex flex-col items-center p-3 rounded-2xl transition-all ${
+                    selectedEntry?.id === entry.id
+                      ? 'bg-indigo-100 ring-2 ring-indigo-400'
+                      : 'bg-white border border-slate-100'
+                  }`}
+                >
+                  <span className="text-2xl">{EMOTION_MAP[entry.emotion].emoji}</span>
+                  <span className="text-xs text-slate-500 mt-1">
+                    {format(new Date(entry.createdAt), 'HH:mm')}
+                  </span>
+                </button>
+              ))}
+            </div>
+
+            {/* Selected entry or all entries */}
+            {selectedEntry ? (
+              <EntryCard entry={selectedEntry} onClose={() => setSelectedEntry(null)} />
+            ) : (
+              entries.map((entry) => (
+                <EntryCard key={entry.id} entry={entry} compact />
+              ))
+            )}
+          </div>
         ) : (
           <div className="flex flex-col items-center justify-center h-[60vh] text-center space-y-6">
             <div className="w-40 h-48 relative">

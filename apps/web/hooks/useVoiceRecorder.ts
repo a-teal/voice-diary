@@ -58,7 +58,6 @@ interface UseVoiceRecorderReturn {
 }
 
 export function useVoiceRecorder(): UseVoiceRecorderReturn {
-  console.log('[useVoiceRecorder] Hook called');
   const [status, setStatus] = useState<RecordingStatus>('idle');
   const [transcript, setTranscript] = useState('');
   const [isSupported, setIsSupported] = useState(true);
@@ -77,24 +76,16 @@ export function useVoiceRecorder(): UseVoiceRecorderReturn {
   // Check platform
   useEffect(() => {
     const platform = Capacitor.getPlatform();
-    console.log('[STT] Platform detected:', platform);
     const native = platform === 'ios' || platform === 'android';
-    console.log('[STT] isNative:', native);
     setIsNative(native);
   }, []);
 
   // Web Speech API setup
   useEffect(() => {
-    console.log('[STT] Web Speech API setup, isNative:', isNative);
-    if (isNative) {
-      console.log('[STT] Skipping web setup - running on native');
-      return;
-    }
+    if (isNative) return;
 
     const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
-    console.log('[STT] SpeechRecognition API available:', !!SpeechRecognitionAPI);
     if (!SpeechRecognitionAPI) {
-      console.error('[STT] Browser does not support speech recognition');
       setIsSupported(false);
       setError('이 브라우저는 음성 인식을 지원하지 않습니다.');
       return;
@@ -105,26 +96,7 @@ export function useVoiceRecorder(): UseVoiceRecorderReturn {
     recognition.continuous = true;
     recognition.interimResults = true;
 
-    console.log('[STT] Speech recognition initialized');
-
-    recognition.onstart = () => {
-      console.log('[STT] Recognition started');
-    };
-
-    recognition.onaudiostart = () => {
-      console.log('[STT] Audio capture started');
-    };
-
-    recognition.onspeechstart = () => {
-      console.log('[STT] Speech detected');
-    };
-
-    recognition.onspeechend = () => {
-      console.log('[STT] Speech ended');
-    };
-
     recognition.onresult = (event: WebSpeechRecognitionEvent) => {
-      console.log('[STT] Result received:', event.results);
       let interimTranscript = '';
       let finalTranscript = finalTranscriptRef.current;
 
@@ -142,7 +114,6 @@ export function useVoiceRecorder(): UseVoiceRecorderReturn {
     };
 
     recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
-      console.error('[STT] Error:', event.error);
       if (event.error === 'not-allowed') {
         setError('마이크 접근 권한이 필요합니다.');
       } else if (event.error === 'no-speech') {
@@ -225,9 +196,7 @@ export function useVoiceRecorder(): UseVoiceRecorderReturn {
 
   // Web speech recognition
   const startWebRecording = useCallback(async () => {
-    console.log('[STT] startWebRecording called, recognitionRef:', !!recognitionRef.current);
     if (!recognitionRef.current) {
-      console.error('[STT] Recognition not initialized');
       setError('음성 인식이 초기화되지 않았습니다. 페이지를 새로고침해주세요.');
       return;
     }
@@ -238,13 +207,9 @@ export function useVoiceRecorder(): UseVoiceRecorderReturn {
     setStatus('recording');
 
     try {
-      console.log('[STT] Requesting microphone access...');
       await navigator.mediaDevices.getUserMedia({ audio: true });
-      console.log('[STT] Microphone access granted, starting recognition...');
       recognitionRef.current.start();
-      console.log('[STT] Recognition start() called');
-    } catch (err) {
-      console.error('[STT] Microphone error:', err);
+    } catch {
       setError('마이크 접근 권한이 필요합니다.');
       setStatus('error');
     }
@@ -258,7 +223,6 @@ export function useVoiceRecorder(): UseVoiceRecorderReturn {
 
   // Unified interface
   const startRecording = useCallback(() => {
-    console.log('[STT] startRecording called, isNative:', isNative);
     if (isNative) {
       startNativeRecording();
     } else {

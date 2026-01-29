@@ -9,10 +9,18 @@ export function getAllEntries(): DiaryEntry[] {
   return data ? JSON.parse(data) : [];
 }
 
-// 날짜별 일기 조회
+// 날짜별 일기 조회 (단일 - 하위 호환)
 export function getEntryByDate(date: string): DiaryEntry | null {
   const entries = getAllEntries();
   return entries.find(entry => entry.date === date) || null;
+}
+
+// 날짜별 일기 조회 (복수)
+export function getEntriesByDate(date: string): DiaryEntry[] {
+  const entries = getAllEntries();
+  return entries
+    .filter(entry => entry.date === date)
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 }
 
 // 월별 일기 조회

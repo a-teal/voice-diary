@@ -2,15 +2,17 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Clock, ChevronDown, ChevronUp } from 'lucide-react';
+import { Clock, ChevronDown, ChevronUp, X } from 'lucide-react';
 import { DiaryEntry } from '@/types';
 import { EMOTION_MAP } from '@/constants/emotions';
 
 interface EntryCardProps {
   entry: DiaryEntry;
+  compact?: boolean;
+  onClose?: () => void;
 }
 
-export default function EntryCard({ entry }: EntryCardProps) {
+export default function EntryCard({ entry, compact = false, onClose }: EntryCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const emotionData = EMOTION_MAP[entry.emotion];
 
@@ -25,6 +27,35 @@ export default function EntryCard({ entry }: EntryCardProps) {
 
   const shouldTruncate = entry.transcript.length > 150;
 
+  // Compact view - just show summary
+  if (compact) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100"
+      >
+        <div className="flex items-center gap-3">
+          <span className="text-2xl">{emotionData.emoji}</span>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <span className="font-semibold text-slate-800 text-sm">{emotionData.labelKo}</span>
+              <span className="text-xs text-slate-400">
+                {formatTime(entry.createdAt)}
+              </span>
+            </div>
+            {entry.summary && (
+              <p className="text-slate-500 text-sm truncate mt-0.5">
+                {entry.summary}
+              </p>
+            )}
+          </div>
+        </div>
+      </motion.div>
+    );
+  }
+
+  // Full view
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -36,7 +67,7 @@ export default function EntryCard({ entry }: EntryCardProps) {
           <span className="text-4xl filter drop-shadow-sm">{emotionData.emoji}</span>
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-bold text-slate-800">{emotionData.label}</span>
+              <span className="font-bold text-slate-800">{emotionData.labelKo}</span>
               <span className="text-xs text-slate-400 flex items-center gap-1 bg-slate-50 px-2 py-0.5 rounded-full">
                 <Clock className="w-3 h-3" />
                 {formatTime(entry.createdAt)}
@@ -54,6 +85,14 @@ export default function EntryCard({ entry }: EntryCardProps) {
             </div>
           </div>
         </div>
+        {onClose && (
+          <button
+            onClick={onClose}
+            className="p-1.5 hover:bg-slate-100 rounded-full transition-colors"
+          >
+            <X className="w-4 h-4 text-slate-400" />
+          </button>
+        )}
       </div>
 
       {/* Summary */}

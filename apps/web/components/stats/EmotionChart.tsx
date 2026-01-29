@@ -10,27 +10,13 @@ import {
   ResponsiveContainer,
   ReferenceLine,
 } from 'recharts';
-import { DiaryEntry, Emotion } from '@/types';
-import { EMOTION_MAP } from '@/constants/emotions';
+import { DiaryEntry } from '@/types';
+import { EMOTION_MAP, MOOD_VALUES } from '@/constants/emotions';
 
 interface EmotionChartProps {
   entries: DiaryEntry[];
   days?: number;
 }
-
-// Map emotions to numeric values for chart
-const EMOTION_VALUES: Record<Emotion, number> = {
-  happy: 5,
-  confident: 4,
-  love: 4,
-  peaceful: 3,
-  neutral: 2,
-  thinking: 2,
-  tired: 1,
-  anxious: 0,
-  sad: -1,
-  angry: -2,
-};
 
 export default function EmotionChart({ entries, days = 7 }: EmotionChartProps) {
   const chartData = useMemo(() => {
@@ -47,7 +33,7 @@ export default function EmotionChart({ entries, days = 7 }: EmotionChartProps) {
       data.push({
         date: dateStr,
         day: date.toLocaleDateString('ko-KR', { weekday: 'short' }),
-        value: entry ? EMOTION_VALUES[entry.emotion] : null,
+        value: entry ? MOOD_VALUES[entry.emotion] : null,
         emotion: entry?.emotion || null,
         emoji: entry ? EMOTION_MAP[entry.emotion].emoji : null,
       });
@@ -89,11 +75,11 @@ export default function EmotionChart({ entries, days = 7 }: EmotionChartProps) {
             tick={{ fontSize: 12, fill: '#9ca3af' }}
           />
           <YAxis
-            domain={[-2, 5]}
+            domain={[0, 6]}
             hide
           />
           <Tooltip content={<CustomTooltip />} />
-          <ReferenceLine y={2} stroke="#e5e7eb" strokeDasharray="3 3" />
+          <ReferenceLine y={3} stroke="#e5e7eb" strokeDasharray="3 3" />
           <Line
             type="monotone"
             dataKey="value"

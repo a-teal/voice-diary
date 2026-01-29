@@ -1,8 +1,7 @@
 import { Emotion } from '@/types';
 
 export const VALID_EMOTIONS: Emotion[] = [
-  'happy', 'sad', 'angry', 'anxious', 'peaceful',
-  'tired', 'thinking', 'confident', 'love', 'neutral'
+  'happy', 'sad', 'angry', 'anxious', 'peaceful', 'tired', 'neutral'
 ];
 
 export function isValidEmotion(emotion: string): emotion is Emotion {
