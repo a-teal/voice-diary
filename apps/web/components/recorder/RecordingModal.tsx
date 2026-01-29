@@ -17,6 +17,7 @@ interface RecordingModalProps {
 type RecordingState = 'idle' | 'recording' | 'analyzing' | 'done';
 
 export default function RecordingModal({ isOpen, onClose, onSaved }: RecordingModalProps) {
+  console.log('[RecordingModal] Rendered, isOpen:', isOpen);
   const {
     status,
     transcript,

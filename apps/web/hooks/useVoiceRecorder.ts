@@ -58,6 +58,7 @@ interface UseVoiceRecorderReturn {
 }
 
 export function useVoiceRecorder(): UseVoiceRecorderReturn {
+  console.log('[useVoiceRecorder] Hook called');
   const [status, setStatus] = useState<RecordingStatus>('idle');
   const [transcript, setTranscript] = useState('');
   const [isSupported, setIsSupported] = useState(true);
