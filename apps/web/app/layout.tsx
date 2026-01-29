@@ -11,6 +11,10 @@ export const metadata: Metadata = {
   title: "Voice Diary - 음성 감정 일기",
   description: "음성으로 기록하고, AI가 분석하는 감정 일기",
   manifest: "/manifest.json",
+  icons: {
+    icon: "/icons/Icon.png",
+    apple: "/icons/Icon@2x.png",
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",

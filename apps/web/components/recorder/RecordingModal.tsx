@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mic, Square, X, Loader2, Check } from 'lucide-react';
+import { Square, X, Loader2, Check } from 'lucide-react';
+import Image from 'next/image';
 import { useVoiceRecorder } from '@/hooks/useVoiceRecorder';
 import { AnalysisResult, DiaryEntry } from '@/types';
 import { saveEntry, generateId } from '@/lib/storage';
@@ -184,7 +185,7 @@ export default function RecordingModal({ isOpen, onClose, onSaved }: RecordingMo
                 {state === 'idle' && (
                   <div className="text-center space-y-4">
                     <div className="w-20 h-20 bg-indigo-50 rounded-full flex items-center justify-center mx-auto">
-                      <Mic className="w-8 h-8 text-indigo-500" />
+                      <Image src="/icons/Icon.png" alt="녹음" width={32} height={32} />
                     </div>
                     <p className="text-slate-500">Tap to start recording</p>
                   </div>
@@ -199,7 +200,7 @@ export default function RecordingModal({ isOpen, onClose, onSaved }: RecordingMo
                         className="absolute inset-0 bg-red-500 rounded-full"
                       />
                       <div className="relative bg-red-500 w-16 h-16 rounded-full flex items-center justify-center shadow-lg shadow-red-200">
-                        <Mic className="w-8 h-8 text-white" />
+                        <Image src="/icons/Icon.png" alt="녹음 중" width={32} height={32} className="brightness-0 invert" />
                       </div>
                     </div>
 

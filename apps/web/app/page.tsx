@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { Mic } from 'lucide-react';
+import Image from 'next/image';
 import Header from '@/components/layout/Header';
 import BottomNav from '@/components/layout/BottomNav';
 import EntryCard from '@/components/diary/EntryCard';
@@ -107,7 +107,7 @@ export default function Home() {
           className="fixed bottom-24 right-6 w-14 h-14 bg-indigo-600 text-white rounded-full shadow-xl shadow-indigo-300 flex items-center justify-center z-20"
           aria-label="녹음 시작"
         >
-          <Mic className="w-7 h-7" />
+          <Image src="/icons/Icon.png" alt="녹음" width={32} height={32} />
         </motion.button>
       )}
 
