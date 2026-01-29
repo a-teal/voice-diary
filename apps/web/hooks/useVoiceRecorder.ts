@@ -76,15 +76,24 @@ export function useVoiceRecorder(): UseVoiceRecorderReturn {
   // Check platform
   useEffect(() => {
     const platform = Capacitor.getPlatform();
-    setIsNative(platform === 'ios' || platform === 'android');
+    console.log('[STT] Platform detected:', platform);
+    const native = platform === 'ios' || platform === 'android';
+    console.log('[STT] isNative:', native);
+    setIsNative(native);
   }, []);
 
   // Web Speech API setup
   useEffect(() => {
-    if (isNative) return;
+    console.log('[STT] Web Speech API setup, isNative:', isNative);
+    if (isNative) {
+      console.log('[STT] Skipping web setup - running on native');
+      return;
+    }
 
     const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
+    console.log('[STT] SpeechRecognition API available:', !!SpeechRecognitionAPI);
     if (!SpeechRecognitionAPI) {
+      console.error('[STT] Browser does not support speech recognition');
       setIsSupported(false);
       setError('이 브라우저는 음성 인식을 지원하지 않습니다.');
       return;
