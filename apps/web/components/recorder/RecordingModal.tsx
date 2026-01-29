@@ -158,10 +158,10 @@ export default function RecordingModal({ isOpen, onClose, onSaved }: RecordingMo
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="fixed bottom-0 left-0 right-0 bg-white rounded-t-3xl z-[70] p-6 pb-10 min-h-[400px] flex flex-col safe-bottom"
+            className="fixed bottom-0 left-0 right-0 bg-white rounded-t-3xl z-[70] p-6 pb-10 safe-bottom"
           >
             {/* Header */}
-            <div className="flex justify-between items-center mb-8">
+            <div className="flex justify-between items-center mb-6">
               <h3 className="text-lg font-semibold text-slate-900">{t('recorder.title')}</h3>
               <button
                 onClick={handleClose}
@@ -173,7 +173,7 @@ export default function RecordingModal({ isOpen, onClose, onSaved }: RecordingMo
 
             {/* Browser not supported */}
             {!isSupported && (
-              <div className="flex-1 flex flex-col items-center justify-center text-center">
+              <div className="flex flex-col items-center text-center py-8">
                 <p className="text-red-500">{errorKey ? t(errorKey) : ''}</p>
                 <p className="text-slate-500 text-sm mt-2">
                   {t('recorder.browserNotSupported')}
@@ -183,67 +183,67 @@ export default function RecordingModal({ isOpen, onClose, onSaved }: RecordingMo
 
             {/* Content */}
             {isSupported && (
-              <div className="flex-1 flex flex-col items-center justify-center space-y-8">
+              <div className="flex flex-col items-center space-y-6">
                 {state === 'idle' && (
-                  <div className="text-center space-y-4">
-                    <div className="w-20 h-20 bg-indigo-50 rounded-full flex items-center justify-center mx-auto">
-                      <MicPencilIcon size={40} className="text-indigo-500" />
+                  <div className="text-center space-y-3">
+                    <div className="w-16 h-16 bg-indigo-50 rounded-full flex items-center justify-center mx-auto">
+                      <MicPencilIcon size={32} className="text-indigo-500" />
                     </div>
-                    <p className="text-slate-500">{t('recorder.tapToStart')}</p>
+                    <p className="text-slate-500 text-sm">{t('recorder.tapToStart')}</p>
                   </div>
                 )}
 
                 {state === 'recording' && (
-                  <div className="text-center w-full space-y-6">
-                    <div className="relative w-24 h-24 mx-auto flex items-center justify-center">
+                  <div className="text-center w-full space-y-4">
+                    <div className="relative w-20 h-20 mx-auto flex items-center justify-center">
                       <motion.div
                         animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.2, 0.5] }}
                         transition={{ repeat: Infinity, duration: 1.5 }}
                         className="absolute inset-0 bg-red-500 rounded-full"
                       />
-                      <div className="relative bg-red-500 w-16 h-16 rounded-full flex items-center justify-center shadow-lg shadow-red-200">
-                        <MicPencilIcon size={32} className="text-white" />
+                      <div className="relative bg-red-500 w-14 h-14 rounded-full flex items-center justify-center shadow-lg shadow-red-200">
+                        <MicPencilIcon size={28} className="text-white" />
                       </div>
                     </div>
 
-                    <div className="font-mono text-3xl font-bold text-slate-800">
+                    <div className="font-mono text-2xl font-bold text-slate-800">
                       {formatDuration(recordingTime)}
                     </div>
 
                     {/* Live transcript */}
                     {transcript && (
-                      <div className="bg-slate-50 rounded-xl p-4 max-h-32 overflow-y-auto">
+                      <div className="bg-slate-50 rounded-xl p-3 max-h-24 overflow-y-auto">
                         <p className="text-slate-600 text-sm">{transcript}</p>
                       </div>
                     )}
 
-                    <p className="text-slate-400 text-sm animate-pulse">{t('recorder.listening')}</p>
+                    <p className="text-slate-400 text-xs animate-pulse">{t('recorder.listening')}</p>
                   </div>
                 )}
 
                 {state === 'analyzing' && (
-                  <div className="text-center space-y-4">
-                    <div className="relative w-20 h-20 mx-auto flex items-center justify-center">
-                      <Loader2 className="w-10 h-10 text-indigo-600 animate-spin" />
+                  <div className="text-center space-y-3">
+                    <div className="relative w-16 h-16 mx-auto flex items-center justify-center">
+                      <Loader2 className="w-8 h-8 text-indigo-600 animate-spin" />
                     </div>
-                    <p className="text-indigo-600 font-medium animate-pulse">
+                    <p className="text-indigo-600 text-sm font-medium animate-pulse">
                       {t('recorder.analyzing')}
                     </p>
                   </div>
                 )}
 
                 {state === 'done' && (
-                  <div className="text-center space-y-6">
+                  <div className="text-center space-y-4">
                     <motion.div
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
-                      className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto"
+                      className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto"
                     >
-                      <Check className="w-10 h-10 text-green-600" />
+                      <Check className="w-8 h-8 text-green-600" />
                     </motion.div>
                     <div>
-                      <h4 className="text-xl font-bold text-slate-800">{t('recorder.ready')}</h4>
-                      <p className="text-slate-500 text-sm mt-1">
+                      <h4 className="text-lg font-bold text-slate-800">{t('recorder.ready')}</h4>
+                      <p className="text-slate-500 text-xs mt-1">
                         {t('recorder.duration')}: {formatDuration(recordingTime)}
                       </p>
                     </div>
@@ -254,11 +254,11 @@ export default function RecordingModal({ isOpen, onClose, onSaved }: RecordingMo
 
             {/* Actions */}
             {isSupported && (
-              <div className="mt-auto pt-6">
+              <div className="pt-4">
                 {state === 'idle' && (
                   <button
                     onClick={handleStartRecording}
-                    className="w-full bg-indigo-600 text-white py-4 rounded-xl font-semibold shadow-lg shadow-indigo-200 hover:bg-indigo-700 active:scale-95 transition-all"
+                    className="w-full bg-indigo-600 text-white py-3.5 rounded-xl font-semibold shadow-lg shadow-indigo-200 hover:bg-indigo-700 active:scale-95 transition-all"
                   >
                     {t('recorder.start')}
                   </button>
@@ -267,7 +267,7 @@ export default function RecordingModal({ isOpen, onClose, onSaved }: RecordingMo
                 {state === 'recording' && (
                   <button
                     onClick={handleStopRecording}
-                    className="w-full bg-slate-900 text-white py-4 rounded-xl font-semibold shadow-lg hover:bg-black active:scale-95 transition-all flex items-center justify-center gap-2"
+                    className="w-full bg-slate-900 text-white py-3.5 rounded-xl font-semibold shadow-lg hover:bg-black active:scale-95 transition-all flex items-center justify-center gap-2"
                   >
                     <Square className="w-5 h-5 fill-current" />
                     {t('recorder.stop')}
@@ -277,7 +277,7 @@ export default function RecordingModal({ isOpen, onClose, onSaved }: RecordingMo
                 {state === 'done' && (
                   <button
                     onClick={handleSave}
-                    className="w-full bg-indigo-600 text-white py-4 rounded-xl font-semibold shadow-lg shadow-indigo-200 hover:bg-indigo-700 active:scale-95 transition-all"
+                    className="w-full bg-indigo-600 text-white py-3.5 rounded-xl font-semibold shadow-lg shadow-indigo-200 hover:bg-indigo-700 active:scale-95 transition-all"
                   >
                     {t('recorder.save')}
                   </button>
