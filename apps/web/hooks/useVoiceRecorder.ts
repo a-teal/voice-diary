@@ -62,6 +62,12 @@ export function useVoiceRecorder(): UseVoiceRecorderReturn {
 
   const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
   const finalTranscriptRef = useRef('');
+  const statusRef = useRef<RecordingStatus>('idle');
+
+  // Keep statusRef in sync
+  useEffect(() => {
+    statusRef.current = status;
+  }, [status]);
 
   // Check platform
   useEffect(() => {
@@ -115,7 +121,7 @@ export function useVoiceRecorder(): UseVoiceRecorderReturn {
     };
 
     recognition.onend = () => {
-      if (status === 'recording') {
+      if (statusRef.current === 'recording') {
         try {
           recognition.start();
         } catch {
@@ -129,7 +135,7 @@ export function useVoiceRecorder(): UseVoiceRecorderReturn {
     return () => {
       recognition.abort();
     };
-  }, [status, isNative]);
+  }, [isNative]);
 
   // Native (Capacitor) speech recognition
   const startNativeRecording = useCallback(async () => {
