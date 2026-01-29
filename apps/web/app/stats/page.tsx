@@ -193,7 +193,7 @@ export default function StatsPage() {
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={chartData}>
                       <XAxis dataKey="date" stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} />
-                      <YAxis hide domain={[0, 6]} />
+                      <YAxis hide domain={[0, 11]} />
                       <Tooltip
                         content={({ payload }) => {
                           if (payload && payload.length) {

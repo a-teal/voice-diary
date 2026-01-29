@@ -75,11 +75,11 @@ export default function EmotionChart({ entries, days = 7 }: EmotionChartProps) {
             tick={{ fontSize: 12, fill: '#9ca3af' }}
           />
           <YAxis
-            domain={[0, 6]}
+            domain={[0, 11]}
             hide
           />
           <Tooltip content={<CustomTooltip />} />
-          <ReferenceLine y={3} stroke="#e5e7eb" strokeDasharray="3 3" />
+          <ReferenceLine y={5.5} stroke="#e5e7eb" strokeDasharray="3 3" />
           <Line
             type="monotone"
             dataKey="value"

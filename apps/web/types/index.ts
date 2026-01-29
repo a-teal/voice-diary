@@ -1,12 +1,18 @@
-// 감정 타입 (7가지)
+// 감정 타입 (10가지: 긍정 4, 중립 2, 부정 4)
 export type Emotion =
-  | 'happy'     // 😊 기쁨/행복
-  | 'sad'       // 😢 슬픔
-  | 'angry'     // 😤 분노/짜증
-  | 'anxious'   // 😰 불안/걱정
-  | 'peaceful'  // 😌 평온/감사
-  | 'tired'     // 😫 피곤/지침
-  | 'neutral';  // 😐 무덤덤
+  // 긍정
+  | 'happy'      // 😊 행복/기쁨
+  | 'grateful'   // 🥰 감사/사랑
+  | 'excited'    // 🤩 신남/설렘
+  | 'peaceful'   // 😌 평온/여유
+  // 중립
+  | 'neutral'    // 😐 무난/보통
+  | 'thoughtful' // 🤔 고민/생각
+  // 부정
+  | 'sad'        // 😢 슬픔/우울
+  | 'angry'      // 😡 화남/짜증
+  | 'anxious'    // 😰 불안/걱정
+  | 'exhausted'; // 😫 지침/스트레스
 
 // 일기 엔트리
 export interface DiaryEntry {
