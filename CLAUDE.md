@@ -98,12 +98,13 @@ ANTHROPIC_API_KEY=sk-ant-xxxxx  # Claude API 키 (필수)
 ## 주요 타입
 
 ```typescript
-type Emotion = 'happy' | 'sad' | 'angry' | 'anxious' | 'peaceful'
-             | 'tired' | 'thinking' | 'confident' | 'love' | 'neutral';
+// 감정 타입 (7가지)
+type Emotion = 'happy' | 'sad' | 'angry' | 'anxious' | 'peaceful' | 'tired' | 'neutral';
+// 😊 기쁨 | 😢 슬픔 | 😤 화남 | 😰 불안 | 😌 평온 | 😫 피곤 | 😐 무덤덤
 
 interface DiaryEntry {
   id: string;
-  date: string;           // YYYY-MM-DD
+  date: string;           // YYYY-MM-DD (하루에 여러 개 가능)
   createdAt: string;      // ISO timestamp
   transcript: string;     // 음성 텍스트
   keywords: string[];     // AI 추출 키워드
