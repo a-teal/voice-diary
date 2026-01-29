@@ -104,10 +104,10 @@ export default function Home() {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => setIsRecordingOpen(true)}
-          className="fixed bottom-24 right-6 w-14 h-14 bg-indigo-600 text-white rounded-full shadow-xl shadow-indigo-300 flex items-center justify-center z-20"
+          className="fixed bottom-24 left-1/2 -translate-x-1/2 w-20 h-20 bg-white rounded-full shadow-xl shadow-slate-200 border border-slate-100 flex items-center justify-center z-20"
           aria-label="녹음 시작"
         >
-          <Image src="/icons/Icon.png" alt="녹음" width={32} height={32} />
+          <Image src="/icons/Icon.png" alt="녹음" width={48} height={48} />
         </motion.button>
       )}
 
