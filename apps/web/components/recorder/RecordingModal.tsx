@@ -112,9 +112,12 @@ export default function RecordingModal({ isOpen, onClose, onSaved }: RecordingMo
     if (!analysisResult) return;
 
     const now = new Date();
+    // Use local timezone for date (YYYY-MM-DD)
+    const localDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+
     const entry: DiaryEntry = {
       id: generateId(),
-      date: now.toISOString().split('T')[0],
+      date: localDate,
       createdAt: now.toISOString(),
       transcript,
       keywords: analysisResult.keywords,
@@ -252,7 +255,7 @@ export default function RecordingModal({ isOpen, onClose, onSaved }: RecordingMo
 
             {/* Actions */}
             {isSupported && (
-              <div className="mt-auto pt-6">
+              <div className="mt-8 pt-6">
                 {state === 'idle' && (
                   <button
                     onClick={handleStartRecording}
