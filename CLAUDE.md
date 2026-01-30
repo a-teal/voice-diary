@@ -152,6 +152,48 @@ interface DiaryEntry {
 - **버튼**: `rounded-xl` (primary: bg-indigo-600)
 - **아이콘**: lucide-react 사용
 
+## 개발 워크플로우
+
+작업 완료 후 반드시 아래 순서를 따릅니다. **커밋되지 않은 코드가 쌓이지 않도록 주의!**
+
+```
+1. 개발 (Development)
+   └── 코드 작성/수정
+
+2. 빌드 테스트 (Build Test)
+   └── npm run build
+   └── 빌드 에러 발생 시 즉시 수정
+
+3. 단위 테스트 (Unit Test)
+   └── npm run test
+   └── 관련 테스트가 있는 경우 실행
+
+4. 배포 (Deploy)
+   └── vercel --prod
+   └── 배포 URL 확인
+
+5. 체크리스트 업데이트 (Checklist Update)
+   └── Docs/checklist.md 업데이트 (해당 시)
+
+6. 커밋 (Commit) ⚠️ 필수!
+   └── git add <변경된 파일>
+   └── git commit -m "type: 설명"
+   └── git push
+```
+
+### 커밋 컨벤션
+- `feat:` 새로운 기능
+- `fix:` 버그 수정
+- `style:` UI/디자인 변경
+- `refactor:` 코드 리팩토링
+- `docs:` 문서 업데이트
+- `chore:` 기타 작업
+
+### 중요 규칙
+- 기능 단위로 커밋 (여러 기능을 한 커밋에 묶지 않기)
+- 배포 후 반드시 커밋
+- 하루 작업 종료 전 모든 변경사항 커밋 확인
+
 ## 참고 문서
 
 - PRD: `Docs/PRD.md`

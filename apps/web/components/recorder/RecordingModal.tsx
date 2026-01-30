@@ -159,7 +159,7 @@ export default function RecordingModal({ isOpen, onClose, onSaved }: RecordingMo
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="fixed bottom-0 left-0 right-0 bg-white rounded-t-3xl z-[70] p-6 pb-10 min-h-[400px] flex flex-col safe-bottom"
+            className="fixed bottom-0 left-0 right-0 bg-white rounded-t-3xl z-[70] p-6 pb-20 min-h-[420px] flex flex-col safe-bottom"
           >
             {/* Header */}
             <div className="flex justify-between items-center mb-8">
