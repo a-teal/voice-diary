@@ -1,0 +1,23 @@
+<svg width="96" height="96" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Microphone body - tilted like original -->
+  <g transform="rotate(-20, 55, 45)">
+    <!-- Mic head -->
+    <ellipse cx="55" cy="30" rx="14" ry="20" fill="#6366f1"/>
+    <!-- Mic body -->
+    <rect x="47" y="48" width="16" height="8" rx="2" fill="#6366f1"/>
+    <!-- Mic arc -->
+    <path d="M35 40 C35 60 75 60 75 40" stroke="#6366f1" stroke-width="5" stroke-linecap="round" fill="none"/>
+    <!-- Stand -->
+    <path d="M55 56 L55 65" stroke="#6366f1" stroke-width="5" stroke-linecap="round"/>
+  </g>
+
+  <!-- Pencil - thicker and more prominent -->
+  <g transform="rotate(-45, 30, 75)">
+    <!-- Pencil body -->
+    <rect x="22" y="50" width="16" height="36" rx="2" fill="#6366f1"/>
+    <!-- Pencil tip - larger and more visible -->
+    <polygon points="22,86 30,96 38,86" fill="#6366f1"/>
+    <!-- Pencil tip accent -->
+    <polygon points="26,88 30,94 34,88" fill="#4f46e5"/>
+  </g>
+</svg>

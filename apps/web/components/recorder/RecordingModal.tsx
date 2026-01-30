@@ -1,9 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Square, X, Loader2, Check } from 'lucide-react';
-import Image from 'next/image';
 import { useVoiceRecorder } from '@/hooks/useVoiceRecorder';
 import { AnalysisResult, DiaryEntry } from '@/types';
 import { saveEntry, generateId } from '@/lib/storage';
@@ -30,16 +29,26 @@ export default function RecordingModal({ isOpen, onClose, onSaved }: RecordingMo
   const [state, setState] = useState<RecordingState>('idle');
   const [recordingTime, setRecordingTime] = useState(0);
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
+  const hasStartedRef = useRef(false);
 
-  // Reset state when opening
+  // Auto-start recording when modal opens
   useEffect(() => {
-    if (isOpen) {
-      setState('idle');
+    if (isOpen && isSupported && !hasStartedRef.current) {
+      hasStartedRef.current = true;
+      resetRecording();
       setRecordingTime(0);
       setAnalysisResult(null);
-      resetRecording();
+      // Small delay to ensure modal is visible
+      const timer = setTimeout(() => {
+        startRecording();
+        setState('recording');
+      }, 300);
+      return () => clearTimeout(timer);
     }
-  }, [isOpen, resetRecording]);
+    if (!isOpen) {
+      hasStartedRef.current = false;
+    }
+  }, [isOpen, isSupported, resetRecording, startRecording]);
 
   // Recording timer
   useEffect(() => {
@@ -63,13 +72,6 @@ export default function RecordingModal({ isOpen, onClose, onSaved }: RecordingMo
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  const handleStartRecording = () => {
-    resetRecording();
-    setRecordingTime(0);
-    startRecording();
-    setState('recording');
   };
 
   const handleStopRecording = async () => {
@@ -147,30 +149,27 @@ export default function RecordingModal({ isOpen, onClose, onSaved }: RecordingMo
           {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
-            animate={{ opacity: 0.5 }}
+            animate={{ opacity: 0.6 }}
             exit={{ opacity: 0 }}
             onClick={handleClose}
             className="fixed inset-0 bg-black z-[60]"
           />
 
-          {/* Modal */}
+          {/* Center Modal */}
           <motion.div
-            initial={{ y: '100%' }}
-            animate={{ y: 0 }}
-            exit={{ y: '100%' }}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="fixed bottom-0 left-0 right-0 bg-white rounded-t-3xl z-[70] p-6 pb-20 min-h-[420px] flex flex-col safe-bottom"
+            className="fixed inset-4 md:inset-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-[400px] md:max-h-[600px] bg-white rounded-3xl z-[70] p-6 flex flex-col overflow-hidden"
           >
-            {/* Header */}
-            <div className="flex justify-between items-center mb-8">
-              <h3 className="text-lg font-semibold text-slate-900">Today&apos;s Entry</h3>
-              <button
-                onClick={handleClose}
-                className="p-2 bg-slate-100 rounded-full hover:bg-slate-200 transition-colors"
-              >
-                <X className="w-5 h-5 text-slate-500" />
-              </button>
-            </div>
+            {/* Close button */}
+            <button
+              onClick={handleClose}
+              className="absolute top-4 right-4 p-2 bg-slate-100 rounded-full hover:bg-slate-200 transition-colors z-10"
+            >
+              <X className="w-5 h-5 text-slate-500" />
+            </button>
 
             {/* Browser not supported */}
             {!isSupported && (
@@ -184,104 +183,85 @@ export default function RecordingModal({ isOpen, onClose, onSaved }: RecordingMo
 
             {/* Content */}
             {isSupported && (
-              <div className="flex-1 flex flex-col items-center justify-center space-y-8">
-                {state === 'idle' && (
-                  <div className="text-center space-y-4">
-                    <div className="w-20 h-20 bg-indigo-50 rounded-full flex items-center justify-center mx-auto">
-                      <Image src="/icons/Icon.png" alt="녹음" width={32} height={32} />
-                    </div>
-                    <p className="text-slate-500">Tap to start recording</p>
-                  </div>
-                )}
-
+              <div className="flex-1 flex flex-col">
+                {/* Recording State */}
                 {state === 'recording' && (
-                  <div className="text-center w-full space-y-6">
-                    <div className="relative w-24 h-24 mx-auto flex items-center justify-center">
+                  <div className="flex-1 flex flex-col">
+                    {/* Header with timer */}
+                    <div className="flex items-center justify-center gap-3 py-4">
                       <motion.div
-                        animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.2, 0.5] }}
-                        transition={{ repeat: Infinity, duration: 1.5 }}
-                        className="absolute inset-0 bg-red-500 rounded-full"
+                        animate={{ scale: [1, 1.2, 1] }}
+                        transition={{ repeat: Infinity, duration: 1 }}
+                        className="w-3 h-3 bg-red-500 rounded-full"
                       />
-                      <div className="relative bg-red-500 w-16 h-16 rounded-full flex items-center justify-center shadow-lg shadow-red-200">
-                        <Image src="/icons/Icon.png" alt="녹음 중" width={32} height={32} className="brightness-0 invert" />
-                      </div>
+                      <span className="font-mono text-2xl font-bold text-slate-800">
+                        {formatDuration(recordingTime)}
+                      </span>
                     </div>
 
-                    <div className="font-mono text-3xl font-bold text-slate-800">
-                      {formatDuration(recordingTime)}
+                    {/* Live transcript area */}
+                    <div className="flex-1 bg-slate-50 rounded-2xl p-4 overflow-y-auto min-h-[200px]">
+                      {transcript ? (
+                        <p className="text-slate-700 text-base leading-relaxed">{transcript}</p>
+                      ) : (
+                        <p className="text-slate-400 text-sm animate-pulse">Listening...</p>
+                      )}
                     </div>
 
-                    {/* Live transcript */}
-                    {transcript && (
-                      <div className="bg-slate-50 rounded-xl p-4 max-h-32 overflow-y-auto">
-                        <p className="text-slate-600 text-sm">{transcript}</p>
-                      </div>
-                    )}
-
-                    <p className="text-slate-400 text-sm animate-pulse">Listening...</p>
+                    {/* Stop button */}
+                    <button
+                      onClick={handleStopRecording}
+                      className="mt-6 w-full bg-slate-900 text-white py-4 rounded-xl font-semibold shadow-lg hover:bg-black active:scale-95 transition-all flex items-center justify-center gap-2"
+                    >
+                      <Square className="w-5 h-5 fill-current" />
+                      Stop Recording
+                    </button>
                   </div>
                 )}
 
+                {/* Analyzing State */}
                 {state === 'analyzing' && (
-                  <div className="text-center space-y-4">
-                    <div className="relative w-20 h-20 mx-auto flex items-center justify-center">
-                      <Loader2 className="w-10 h-10 text-indigo-600 animate-spin" />
-                    </div>
+                  <div className="flex-1 flex flex-col items-center justify-center space-y-4">
+                    <Loader2 className="w-12 h-12 text-indigo-600 animate-spin" />
                     <p className="text-indigo-600 font-medium animate-pulse">
                       AI is analyzing your mood...
                     </p>
                   </div>
                 )}
 
+                {/* Done State */}
                 {state === 'done' && (
-                  <div className="text-center space-y-6">
-                    <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto"
-                    >
-                      <Check className="w-10 h-10 text-green-600" />
-                    </motion.div>
-                    <div>
-                      <h4 className="text-xl font-bold text-slate-800">Ready to save!</h4>
-                      <p className="text-slate-500 text-sm mt-1">
-                        Duration: {formatDuration(recordingTime)}
-                      </p>
+                  <div className="flex-1 flex flex-col">
+                    <div className="flex-1 flex flex-col items-center justify-center space-y-4">
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center"
+                      >
+                        <Check className="w-8 h-8 text-green-600" />
+                      </motion.div>
+                      <div className="text-center">
+                        <h4 className="text-xl font-bold text-slate-800">Ready to save!</h4>
+                        <p className="text-slate-500 text-sm mt-1">
+                          Duration: {formatDuration(recordingTime)}
+                        </p>
+                      </div>
                     </div>
+                    <button
+                      onClick={handleSave}
+                      className="w-full bg-indigo-600 text-white py-4 rounded-xl font-semibold shadow-lg shadow-indigo-200 hover:bg-indigo-700 active:scale-95 transition-all"
+                    >
+                      Save Entry
+                    </button>
                   </div>
                 )}
-              </div>
-            )}
 
-            {/* Actions */}
-            {isSupported && (
-              <div className="mt-8 pt-6">
+                {/* Idle State (shouldn't normally show since auto-start) */}
                 {state === 'idle' && (
-                  <button
-                    onClick={handleStartRecording}
-                    className="w-full bg-indigo-600 text-white py-4 rounded-xl font-semibold shadow-lg shadow-indigo-200 hover:bg-indigo-700 active:scale-95 transition-all"
-                  >
-                    Start Recording
-                  </button>
-                )}
-
-                {state === 'recording' && (
-                  <button
-                    onClick={handleStopRecording}
-                    className="w-full bg-slate-900 text-white py-4 rounded-xl font-semibold shadow-lg hover:bg-black active:scale-95 transition-all flex items-center justify-center gap-2"
-                  >
-                    <Square className="w-5 h-5 fill-current" />
-                    Stop Recording
-                  </button>
-                )}
-
-                {state === 'done' && (
-                  <button
-                    onClick={handleSave}
-                    className="w-full bg-indigo-600 text-white py-4 rounded-xl font-semibold shadow-lg shadow-indigo-200 hover:bg-indigo-700 active:scale-95 transition-all"
-                  >
-                    Save Entry
-                  </button>
+                  <div className="flex-1 flex flex-col items-center justify-center">
+                    <Loader2 className="w-8 h-8 text-indigo-600 animate-spin" />
+                    <p className="text-slate-500 mt-2">Starting...</p>
+                  </div>
                 )}
               </div>
             )}
