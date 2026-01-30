@@ -84,10 +84,22 @@ export function useVoiceRecorder(): UseVoiceRecorderReturn {
   useEffect(() => {
     if (isNative) return;
 
+    // HTTPS 체크 (localhost 제외)
+    const isSecureContext = window.isSecureContext ||
+      window.location.protocol === 'https:' ||
+      window.location.hostname === 'localhost' ||
+      window.location.hostname === '127.0.0.1';
+
+    if (!isSecureContext) {
+      setIsSupported(false);
+      setError('음성 인식은 HTTPS 연결이 필요합니다.');
+      return;
+    }
+
     const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognitionAPI) {
       setIsSupported(false);
-      setError('이 브라우저는 음성 인식을 지원하지 않습니다.');
+      setError('이 브라우저는 음성 인식을 지원하지 않습니다. Chrome, Safari, Edge를 사용해주세요.');
       return;
     }
 
@@ -95,6 +107,7 @@ export function useVoiceRecorder(): UseVoiceRecorderReturn {
     recognition.lang = 'ko-KR';
     recognition.continuous = true;
     recognition.interimResults = true;
+    recognition.maxAlternatives = 1; // 안드로이드 성능 향상
 
     recognition.onresult = (event: WebSpeechRecognitionEvent) => {
       let interimTranscript = '';
@@ -114,23 +127,44 @@ export function useVoiceRecorder(): UseVoiceRecorderReturn {
     };
 
     recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
+      console.log('Speech recognition error:', event.error);
+
       if (event.error === 'not-allowed') {
         setError('마이크 접근 권한이 필요합니다.');
+        setStatus('error');
       } else if (event.error === 'no-speech') {
-        setError('음성이 감지되지 않았습니다.');
+        // Android에서 자주 발생 - 에러로 처리하지 않고 계속 녹음
+        // 상태는 유지하고 onend에서 재시작
+        console.log('No speech detected, will restart...');
+      } else if (event.error === 'aborted') {
+        // 사용자가 중단한 경우 - 무시
+        console.log('Recognition aborted');
+      } else if (event.error === 'network') {
+        setError('네트워크 연결을 확인해주세요.');
+        setStatus('error');
+      } else if (event.error === 'service-not-allowed') {
+        setError('음성 인식 서비스를 사용할 수 없습니다.');
+        setStatus('error');
       } else {
-        setError('음성 인식 중 오류가 발생했습니다.');
+        // 기타 에러는 재시도
+        console.log('Other error, will try to restart...');
       }
-      setStatus('error');
     };
 
     recognition.onend = () => {
+      console.log('Recognition ended, status:', statusRef.current);
       if (statusRef.current === 'recording') {
-        try {
-          recognition.start();
-        } catch {
-          // Ignore if already started
-        }
+        // Android에서 continuous 모드가 불안정하므로 재시작
+        setTimeout(() => {
+          if (statusRef.current === 'recording') {
+            try {
+              recognition.start();
+              console.log('Recognition restarted');
+            } catch (e) {
+              console.log('Restart failed:', e);
+            }
+          }
+        }, 100); // 약간의 딜레이로 안정성 향상
       }
     };
 
@@ -198,19 +232,51 @@ export function useVoiceRecorder(): UseVoiceRecorderReturn {
   const startWebRecording = useCallback(async () => {
     if (!recognitionRef.current) {
       setError('음성 인식이 초기화되지 않았습니다. 페이지를 새로고침해주세요.');
+      setStatus('error');
       return;
     }
 
     setError(null);
     finalTranscriptRef.current = '';
     setTranscript('');
-    setStatus('recording');
 
     try {
-      await navigator.mediaDevices.getUserMedia({ audio: true });
-      recognitionRef.current.start();
-    } catch {
-      setError('마이크 접근 권한이 필요합니다.');
+      // 먼저 마이크 권한 요청
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      // 스트림 해제 (권한 확인용)
+      stream.getTracks().forEach(track => track.stop());
+
+      setStatus('recording');
+
+      // 약간의 딜레이 후 시작 (안드로이드 안정성)
+      setTimeout(() => {
+        try {
+          recognitionRef.current?.start();
+          console.log('Speech recognition started');
+        } catch (e) {
+          console.error('Start error:', e);
+          // 이미 시작된 경우 무시
+          if (e instanceof Error && !e.message.includes('already started')) {
+            setError('음성 인식을 시작할 수 없습니다.');
+            setStatus('error');
+          }
+        }
+      }, 100);
+    } catch (err) {
+      console.error('Microphone error:', err);
+      if (err instanceof Error) {
+        if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+          setError('마이크 접근 권한이 필요합니다. 브라우저 설정에서 허용해주세요.');
+        } else if (err.name === 'NotFoundError') {
+          setError('마이크를 찾을 수 없습니다.');
+        } else if (err.name === 'NotReadableError') {
+          setError('마이크가 다른 앱에서 사용 중입니다.');
+        } else {
+          setError(`마이크 오류: ${err.message}`);
+        }
+      } else {
+        setError('마이크 접근 권한이 필요합니다.');
+      }
       setStatus('error');
     }
   }, []);
