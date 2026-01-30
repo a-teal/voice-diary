@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { subDays, isAfter, format } from 'date-fns';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { Search, X } from 'lucide-react';
@@ -9,11 +10,20 @@ import { DiaryEntry, Emotion } from '@/types';
 import { getAllEntries } from '@/lib/storage';
 import { EMOTION_MAP, MOOD_VALUES, EMOTIONS } from '@/constants/emotions';
 
-export default function StatsPage() {
+function StatsContent() {
+  const searchParams = useSearchParams();
   const [entries, setEntries] = useState<DiaryEntry[]>([]);
   const [period, setPeriod] = useState<7 | 30>(7);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedEmotion, setSelectedEmotion] = useState<Emotion | null>(null);
+
+  // Initialize search from URL params
+  useEffect(() => {
+    const searchFromUrl = searchParams.get('search');
+    if (searchFromUrl) {
+      setSearchQuery(searchFromUrl);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     const allEntries = getAllEntries();
@@ -286,5 +296,17 @@ export default function StatsPage() {
 
       <BottomNav />
     </div>
+  );
+}
+
+export default function StatsPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex flex-col min-h-screen bg-slate-50 items-center justify-center">
+        <div className="w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+      </div>
+    }>
+      <StatsContent />
+    </Suspense>
   );
 }

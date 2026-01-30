@@ -104,7 +104,9 @@ export default function Home() {
               <EntryCard entry={selectedEntry} onClose={() => setSelectedEntry(null)} />
             ) : (
               entries.map((entry) => (
-                <EntryCard key={entry.id} entry={entry} compact />
+                <div key={entry.id} onClick={() => setSelectedEntry(entry)} className="cursor-pointer">
+                  <EntryCard entry={entry} compact />
+                </div>
               ))
             )}
           </div>

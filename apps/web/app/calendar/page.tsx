@@ -31,9 +31,21 @@ export default function CalendarPage() {
   const startDay = getDay(startOfMonth(currentMonth));
   const paddingDays = Array.from({ length: startDay });
 
-  const getEntryForDay = (date: Date) => {
+  // Get representative emotion for a day (longest transcript = most detailed entry)
+  const getRepresentativeEntry = (date: Date) => {
     const dateStr = format(date, 'yyyy-MM-dd');
-    return entries.find(e => e.date === dateStr);
+    const dayEntries = entries.filter(e => e.date === dateStr);
+    if (dayEntries.length === 0) return null;
+    // Return entry with longest transcript
+    return dayEntries.reduce((longest, current) =>
+      current.transcript.length > longest.transcript.length ? current : longest
+    );
+  };
+
+  // Count entries for a day
+  const getEntryCount = (date: Date) => {
+    const dateStr = format(date, 'yyyy-MM-dd');
+    return entries.filter(e => e.date === dateStr).length;
   };
 
   const handleDateSelect = (date: Date) => {
@@ -79,7 +91,8 @@ export default function CalendarPage() {
           ))}
 
           {daysInMonth.map((date) => {
-            const entry = getEntryForDay(date);
+            const representativeEntry = getRepresentativeEntry(date);
+            const entryCount = getEntryCount(date);
             const isToday = isSameDay(date, new Date());
 
             return (
@@ -98,10 +111,15 @@ export default function CalendarPage() {
                   {format(date, "d")}
                 </span>
 
-                {entry && (
-                  <span className="text-lg absolute bottom-0 filter drop-shadow-sm transform hover:scale-125 transition-transform">
-                    {EMOTION_MAP[entry.emotion].emoji}
-                  </span>
+                {representativeEntry && (
+                  <div className="absolute bottom-0 flex items-center">
+                    <span className="text-lg filter drop-shadow-sm transform hover:scale-125 transition-transform">
+                      {EMOTION_MAP[representativeEntry.emotion].emoji}
+                    </span>
+                    {entryCount > 1 && (
+                      <span className="text-[10px] text-slate-400 ml-0.5">+{entryCount - 1}</span>
+                    )}
+                  </div>
                 )}
               </button>
             );

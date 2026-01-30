@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Clock, ChevronDown, ChevronUp, X } from 'lucide-react';
 import { DiaryEntry } from '@/types';
@@ -13,8 +14,14 @@ interface EntryCardProps {
 }
 
 export default function EntryCard({ entry, compact = false, onClose }: EntryCardProps) {
+  const router = useRouter();
   const [isExpanded, setIsExpanded] = useState(false);
   const emotionData = EMOTION_MAP[entry.emotion];
+
+  const handleHashtagClick = (keyword: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    router.push(`/stats?search=${encodeURIComponent(keyword)}`);
+  };
 
   const formatTime = (isoString: string) => {
     const date = new Date(isoString);
@@ -75,12 +82,13 @@ export default function EntryCard({ entry, compact = false, onClose }: EntryCard
             </div>
             <div className="flex flex-wrap gap-1.5 mt-2">
               {entry.keywords.map((keyword, index) => (
-                <span
+                <button
                   key={index}
-                  className="text-[10px] bg-slate-100 text-slate-600 px-2 py-1 rounded-md font-medium"
+                  onClick={(e) => handleHashtagClick(keyword, e)}
+                  className="text-[10px] bg-slate-100 text-slate-600 px-2 py-1 rounded-md font-medium hover:bg-indigo-100 hover:text-indigo-600 transition-colors"
                 >
                   #{keyword}
-                </span>
+                </button>
               ))}
             </div>
           </div>
