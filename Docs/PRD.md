@@ -198,6 +198,10 @@ interface DiaryEntry {
 - [x] Capacitor 설정
 - [x] iOS/Android 프로젝트 생성
 - [x] 네이티브 음성인식 플러그인
+- [x] 다국어 지원 (영어/한국어)
+- [x] 브랜드 아이콘 (MicPencilIcon)
+- [x] STT 안정성 개선 (끊김 문제 해결)
+- [x] 타임존 버그 수정 (로컬 날짜 저장)
 - [ ] iOS Simulator 테스트
 - [ ] Android Emulator 테스트
 - [ ] 앱 스토어 배포

@@ -187,6 +187,24 @@ function Component() {
 2. `lib/i18n.tsx`의 `SUPPORTED_LOCALES`에 추가
 3. `messages` 객체에 import 추가
 
+## 주요 유틸리티
+
+### 날짜 처리 (storage.ts)
+```typescript
+// 로컬 타임존 기준 YYYY-MM-DD 반환
+getLocalDateString(date?: Date): string
+
+// 주의: toISOString()은 UTC 기준이므로 사용하지 않음
+// 나쁜 예: date.toISOString().split('T')[0]  // UTC 기준
+// 좋은 예: getLocalDateString(date)          // 로컬 기준
+```
+
+### 음성 인식 (useVoiceRecorder.ts)
+```typescript
+// isRecordingRef로 녹음 상태 추적 (클로저 이슈 방지)
+// 브라우저 언어 자동 감지: navigator.language
+```
+
 ## 참고 문서
 
 - PRD: `Docs/PRD.md`
