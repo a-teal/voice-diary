@@ -115,11 +115,17 @@ export function useVoiceRecorder(): UseVoiceRecorderReturn {
 
       for (let i = event.resultIndex; i < event.results.length; i++) {
         const result = event.results[i];
+        const text = result[0].transcript;
+
         if (result.isFinal) {
-          finalTranscript += result[0].transcript + ' ';
-          finalTranscriptRef.current = finalTranscript;
+          // 중복 방지: 이미 추가된 텍스트인지 확인
+          const trimmedText = text.trim();
+          if (trimmedText && !finalTranscript.includes(trimmedText)) {
+            finalTranscript += trimmedText + ' ';
+            finalTranscriptRef.current = finalTranscript;
+          }
         } else {
-          interimTranscript += result[0].transcript;
+          interimTranscript += text;
         }
       }
 
