@@ -112,9 +112,9 @@ export default function Home() {
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center h-[60vh] text-center space-y-6">
-            <div className="w-56 h-52 relative">
+            <div className="w-56 h-56 relative">
               {/* Pooh-style Honey Pot with Open Lid */}
-              <svg viewBox="0 0 140 160" fill="none" className="w-full h-full">
+              <svg viewBox="-10 -25 160 185" fill="none" className="w-full h-full">
                 {/* Shadow under pot */}
                 <ellipse cx="70" cy="150" rx="40" ry="5" fill="#c7d2fe" opacity="0.3"/>
 
