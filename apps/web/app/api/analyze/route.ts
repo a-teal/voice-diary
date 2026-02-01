@@ -131,15 +131,26 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate and sanitize result
+    // Validate and sanitize result - ensure at least 3 keywords
+    const fallbackKeywords = ['일상', '기록', '오늘'];
     if (!Array.isArray(result.keywords) || result.keywords.length === 0) {
-      result.keywords = ['일상'];
+      result.keywords = fallbackKeywords;
     } else {
       // Limit to 5 keywords, sanitize each
       result.keywords = result.keywords
         .slice(0, 5)
         .map(k => String(k).slice(0, 20));
+      // Ensure at least 3 keywords
+      while (result.keywords.length < 3) {
+        const fallback = fallbackKeywords[result.keywords.length];
+        if (!result.keywords.includes(fallback)) {
+          result.keywords.push(fallback);
+        } else {
+          result.keywords.push('메모');
+        }
+      }
     }
+    console.log('Final keywords:', result.keywords);
 
     // Summary 검증
     if (!result.summary || typeof result.summary !== 'string') {

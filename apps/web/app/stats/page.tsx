@@ -138,19 +138,20 @@ function StatsContent() {
           )}
         </div>
 
-        {/* Emotion filter */}
-        <div className="flex gap-2 mt-3 overflow-x-auto pb-2">
+        {/* Emotion filter - emoji only, single line */}
+        <div className="flex gap-2 mt-3 overflow-x-auto pb-2 flex-nowrap">
           {EMOTIONS.map((emotion) => (
             <button
               key={emotion}
               onClick={() => setSelectedEmotion(selectedEmotion === emotion ? null : emotion)}
-              className={`flex-shrink-0 px-3 py-1.5 rounded-full text-sm transition-all ${
+              className={`flex-shrink-0 w-10 h-10 rounded-full text-xl flex items-center justify-center transition-all ${
                 selectedEmotion === emotion
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  ? 'bg-indigo-100 ring-2 ring-indigo-500'
+                  : 'bg-slate-100 opacity-60 hover:opacity-100'
               }`}
+              title={EMOTION_MAP[emotion].labelKo}
             >
-              {EMOTION_MAP[emotion].emoji} {EMOTION_MAP[emotion].labelKo}
+              {EMOTION_MAP[emotion].emoji}
             </button>
           ))}
         </div>

@@ -27,45 +27,44 @@ export function getDiaryAnalysisPrompt(): string {
 }
 
 // Fallback prompt in case file loading fails
-const FALLBACK_PROMPT = `You are an emotion classifier for voice diary transcripts.
+const FALLBACK_PROMPT = `You are an expert diary emotion analyst. Detect the TRUE underlying emotion.
 
-Return **ONLY valid JSON**.
-No extra text. No markdown. No code fences.
+Return **ONLY valid JSON**. No extra text. No markdown. No code fences.
 
 ## Output JSON schema (STRICT)
 {
   "emotionKey": "happy|grateful|excited|peaceful|neutral|thoughtful|sad|angry|anxious|exhausted",
-  "keywords": ["string", "string"],
+  "keywords": ["string", "string", "string"],
   "reason": "string"
 }
 
 ## Rules
 
-### 1) emotionKey (language-invariant)
-- emotionKey MUST be exactly one of:
-  happy, grateful, excited, peaceful, neutral, thoughtful, sad, angry, anxious, exhausted
+### 1) emotionKey - MUST be one of:
+happy, grateful, excited, peaceful, neutral, thoughtful, sad, angry, anxious, exhausted
 
-### 2) keywords (locale-aware)
-- keywords MUST be 2~5 items, unique, each max 14 characters.
-- If locale="en": keywords in English.
-- If locale="ko": keywords in Korean.
+### 2) keywords - MUST be 3~5 items
+Extract meaningful nouns/topics. Korean for locale=ko.
 
-### 3) reason (locale-aware)
-- reason MUST be exactly one concise sentence.
+### 3) reason - One concise sentence summary
 
-### 4) "neutral" is NOT a default
-Choose "neutral" ONLY if ALL are true:
-- No emotion/evaluation words.
-- No interjections/onomatopoeia/sigh markers.
-- No causality/reason markers.
-- No decision/conflict/uncertainty.
-- Mostly factual listing only.
+### 4) CRITICAL: "neutral" is almost NEVER correct
+DO NOT choose "neutral" unless text is purely factual with ZERO emotional hints.
+- Any interjection (하…, 휴…, 에휴, 아 진짜) → NOT neutral
+- Any causality marker (때문에, 그래서) → NOT neutral
+- Any uncertainty (해야, 어쩌지, 모르겠) → thoughtful, NOT neutral
+- Any fatigue mention (피곤, 지침) → exhausted, NOT neutral
+- Any complaint (짜증, 답답) → angry, NOT neutral
 
-If ANY of the above is violated → DO NOT choose "neutral".
-
-### 5) Mandatory preference rules
-- If decision/conflict/uncertainty exists → prefer "thoughtful".
-- If fatigue/low condition exists → prefer "exhausted".
+### 5) Preference hierarchy
+1. Fatigue → exhausted
+2. Uncertainty → thoughtful
+3. Frustration → angry
+4. Worry → anxious
+5. Sadness → sad
+6. Achievement → grateful/excited
+7. Calm → peaceful
+8. Joy → happy
 
 ## Now analyze this input
 { "transcript": "{transcript}", "locale": "{locale}" }`;

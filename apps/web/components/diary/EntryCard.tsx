@@ -80,17 +80,19 @@ export default function EntryCard({ entry, compact = false, onClose }: EntryCard
                 {formatTime(entry.createdAt)}
               </span>
             </div>
-            <div className="flex flex-wrap gap-1.5 mt-2">
-              {entry.keywords.map((keyword, index) => (
-                <button
-                  key={index}
-                  onClick={(e) => handleHashtagClick(keyword, e)}
-                  className="text-[10px] bg-slate-100 text-slate-600 px-2 py-1 rounded-md font-medium hover:bg-indigo-100 hover:text-indigo-600 transition-colors"
-                >
-                  #{keyword}
-                </button>
-              ))}
-            </div>
+            {entry.keywords && entry.keywords.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mt-2">
+                {entry.keywords.map((keyword, index) => (
+                  <button
+                    key={index}
+                    onClick={(e) => handleHashtagClick(keyword, e)}
+                    className="text-[10px] bg-slate-100 text-slate-600 px-2 py-1 rounded-md font-medium hover:bg-indigo-100 hover:text-indigo-600 transition-colors"
+                  >
+                    #{keyword}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         </div>
         {onClose && (

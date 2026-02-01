@@ -70,6 +70,7 @@ export function useVoiceRecorder(): UseVoiceRecorderReturn {
   const processedResultsRef = useRef<number>(0); // 처리된 결과 수 추적
   const interimDebounceRef = useRef<NodeJS.Timeout | null>(null);
   const lastInterimRef = useRef<string>(''); // 마지막 interim 결과 저장
+  const segmentStartRef = useRef(0); // 현재 세그먼트 시작 위치 (재시작 후 새 세그먼트 추적용)
 
   // Keep statusRef in sync
   useEffect(() => {
@@ -131,13 +132,49 @@ export function useVoiceRecorder(): UseVoiceRecorderReturn {
         if (result.isFinal) {
           const trimmedText = text.trim();
           if (trimmedText) {
-            // 마지막 추가된 텍스트와 겹치는지 확인 (부분 중복 방지)
-            const lastWords = finalTranscript.trim().split(' ').slice(-5).join(' ');
-            const isOverlap = lastWords && trimmedText.startsWith(lastWords.slice(-20));
+            // Get the base (text before current segment) and current segment
+            const base = finalTranscript.slice(0, segmentStartRef.current);
+            const currentSegment = finalTranscript.slice(segmentStartRef.current).trim();
 
-            if (!isOverlap && !finalTranscript.includes(trimmedText)) {
-              finalTranscript += trimmedText + ' ';
+            if (currentSegment === '') {
+              // First result in this segment
+              finalTranscript = base + trimmedText + ' ';
               finalTranscriptRef.current = finalTranscript;
+              console.log('[STT] New segment started:', trimmedText);
+            } else if (trimmedText.startsWith(currentSegment)) {
+              // Simple extension of current segment
+              finalTranscript = base + trimmedText + ' ';
+              finalTranscriptRef.current = finalTranscript;
+              console.log('[STT] Extended segment to:', trimmedText);
+            } else {
+              // Android sends cumulative results with possible corrections
+              // Compare by words within current segment only
+              const currentWords = currentSegment.split(/\s+/);
+              const newWords = trimmedText.split(/\s+/);
+
+              // Find common prefix length (words matching from start)
+              let commonPrefix = 0;
+              const minLen = Math.min(currentWords.length, newWords.length);
+              for (let j = 0; j < minLen; j++) {
+                if (currentWords[j] === newWords[j]) {
+                  commonPrefix++;
+                } else {
+                  break;
+                }
+              }
+
+              // If at least 1 word matches at start, treat as cumulative/correction within segment
+              if (commonPrefix >= 1) {
+                // Use the newer version (likely longer or corrected)
+                finalTranscript = base + trimmedText + ' ';
+                finalTranscriptRef.current = finalTranscript;
+                console.log('[STT] Corrected segment to:', trimmedText, `(${commonPrefix}/${minLen} words matched)`);
+              } else if (!currentSegment.includes(trimmedText)) {
+                // Completely different - skip (shouldn't happen within same segment)
+                console.log('[STT] Skipping unrelated within segment:', trimmedText);
+              } else {
+                console.log('[STT] Skipping contained:', trimmedText);
+              }
             }
           }
           // 처리 완료된 결과 인덱스 업데이트
@@ -205,7 +242,9 @@ export function useVoiceRecorder(): UseVoiceRecorderReturn {
         // Android에서 continuous 모드가 불안정하므로 재시작
         // 재시작 전 인덱스 리셋 (새 세션은 0부터 시작)
         processedResultsRef.current = 0;
-        console.log('[STT] Scheduling restart in 100ms...');
+        // 새 세그먼트 시작 위치 기록 (현재 transcript 끝)
+        segmentStartRef.current = finalTranscriptRef.current.length;
+        console.log('[STT] Scheduling restart in 100ms, new segment starts at:', segmentStartRef.current);
         setTimeout(() => {
           if (statusRef.current === 'recording') {
             try {
@@ -386,6 +425,7 @@ export function useVoiceRecorder(): UseVoiceRecorderReturn {
     finalTranscriptRef.current = '';
     processedResultsRef.current = 0;
     lastInterimRef.current = '';
+    segmentStartRef.current = 0;
   }, [isNative]);
 
   return {
