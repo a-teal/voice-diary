@@ -68,6 +68,8 @@ export function useVoiceRecorder(): UseVoiceRecorderReturn {
   const finalTranscriptRef = useRef('');
   const statusRef = useRef<RecordingStatus>('idle');
   const processedResultsRef = useRef<number>(0); // 처리된 결과 수 추적
+  const interimDebounceRef = useRef<NodeJS.Timeout | null>(null);
+  const lastInterimRef = useRef<string>(''); // 마지막 interim 결과 저장
 
   // Keep statusRef in sync
   useEffect(() => {
@@ -113,6 +115,7 @@ export function useVoiceRecorder(): UseVoiceRecorderReturn {
     recognition.onresult = (event: WebSpeechRecognitionEvent) => {
       let interimTranscript = '';
       let finalTranscript = finalTranscriptRef.current;
+      let hasFinalResult = false;
 
       // 안드로이드 중복 방지: 이미 처리한 결과는 건너뛰기
       const startIndex = Math.max(event.resultIndex, processedResultsRef.current);
@@ -135,12 +138,36 @@ export function useVoiceRecorder(): UseVoiceRecorderReturn {
           }
           // 처리 완료된 결과 인덱스 업데이트
           processedResultsRef.current = i + 1;
+          hasFinalResult = true;
         } else {
           interimTranscript += text;
         }
       }
 
-      setTranscript((finalTranscript + interimTranscript).trim());
+      // Final 결과는 즉시 반영
+      if (hasFinalResult) {
+        // 기존 debounce 타이머 취소
+        if (interimDebounceRef.current) {
+          clearTimeout(interimDebounceRef.current);
+          interimDebounceRef.current = null;
+        }
+        lastInterimRef.current = '';
+        setTranscript((finalTranscript + interimTranscript).trim());
+      } else if (interimTranscript) {
+        // Interim 결과는 debounce 처리 (150ms)
+        // 자모 깨짐 방지: 빠른 업데이트 억제
+        lastInterimRef.current = interimTranscript;
+
+        if (interimDebounceRef.current) {
+          clearTimeout(interimDebounceRef.current);
+        }
+
+        interimDebounceRef.current = setTimeout(() => {
+          // 가장 최근 interim 결과만 반영
+          setTranscript((finalTranscriptRef.current + lastInterimRef.current).trim());
+          interimDebounceRef.current = null;
+        }, 150);
+      }
     };
 
     recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
@@ -191,6 +218,11 @@ export function useVoiceRecorder(): UseVoiceRecorderReturn {
 
     return () => {
       recognition.abort();
+      // 타이머 정리
+      if (interimDebounceRef.current) {
+        clearTimeout(interimDebounceRef.current);
+        interimDebounceRef.current = null;
+      }
     };
   }, [isNative]);
 
@@ -335,11 +367,17 @@ export function useVoiceRecorder(): UseVoiceRecorderReturn {
     } else if (recognitionRef.current) {
       recognitionRef.current.abort();
     }
+    // 타이머 정리
+    if (interimDebounceRef.current) {
+      clearTimeout(interimDebounceRef.current);
+      interimDebounceRef.current = null;
+    }
     setStatus('idle');
     setTranscript('');
     setError(null);
     finalTranscriptRef.current = '';
     processedResultsRef.current = 0;
+    lastInterimRef.current = '';
   }, [isNative]);
 
   return {

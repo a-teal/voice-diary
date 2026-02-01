@@ -12,12 +12,15 @@ export function getDiaryAnalysisPrompt(): string {
   }
 
   try {
+    console.log('[Prompt] Loading from:', promptPath);
     const content = fs.readFileSync(promptPath, 'utf-8');
     // Remove markdown title (first line starting with #)
     _cachedPrompt = content.replace(/^#.*\n\n?/, '').trim();
+    console.log('[Prompt] Loaded successfully, length:', _cachedPrompt.length);
     return _cachedPrompt;
   } catch (error) {
-    console.error('Failed to load prompt file:', error);
+    console.error('[Prompt] Failed to load file:', error);
+    console.log('[Prompt] Using fallback prompt');
     // Fallback to inline prompt
     return FALLBACK_PROMPT;
   }

@@ -101,19 +101,30 @@ export async function POST(request: NextRequest) {
       // Extract JSON from response (handle markdown code blocks)
       const jsonMatch = content.match(/\{[\s\S]*\}/);
       if (!jsonMatch) {
+        console.error('JSON not found in response. Full content:', content);
         throw new Error('JSON not found in response');
       }
+
       const parsed = JSON.parse(jsonMatch[0]);
+      console.log('Parsed JSON:', JSON.stringify(parsed, null, 2));
 
       // Map new response format to AnalysisResult
       // emotionKey → emotion, reason → summary
+      // keywords 배열 검증
+      let keywords: string[] = [];
+      if (Array.isArray(parsed.keywords)) {
+        keywords = parsed.keywords.filter((k: unknown) => typeof k === 'string' && k.trim());
+      }
+      console.log('Extracted keywords:', keywords);
+
       result = {
-        keywords: parsed.keywords || [],
+        keywords,
         emotion: normalizeEmotion(parsed.emotionKey || parsed.emotion || ''),
         summary: parsed.reason || parsed.summary || '오늘의 기록',
       };
-    } catch {
+    } catch (parseError) {
       console.error('Failed to parse AI response:', content);
+      console.error('Parse error:', parseError);
       return NextResponse.json(
         { error: 'AI 응답을 파싱할 수 없습니다.' },
         { status: 500 }
