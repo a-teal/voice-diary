@@ -67,6 +67,7 @@ export function useVoiceRecorder(): UseVoiceRecorderReturn {
   const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
   const finalTranscriptRef = useRef('');
   const statusRef = useRef<RecordingStatus>('idle');
+  const processedResultsRef = useRef<number>(0); // 처리된 결과 수 추적
 
   // Keep statusRef in sync
   useEffect(() => {
@@ -113,17 +114,27 @@ export function useVoiceRecorder(): UseVoiceRecorderReturn {
       let interimTranscript = '';
       let finalTranscript = finalTranscriptRef.current;
 
-      for (let i = event.resultIndex; i < event.results.length; i++) {
+      // 안드로이드 중복 방지: 이미 처리한 결과는 건너뛰기
+      const startIndex = Math.max(event.resultIndex, processedResultsRef.current);
+
+      for (let i = startIndex; i < event.results.length; i++) {
         const result = event.results[i];
         const text = result[0].transcript;
 
         if (result.isFinal) {
-          // 중복 방지: 이미 추가된 텍스트인지 확인
           const trimmedText = text.trim();
-          if (trimmedText && !finalTranscript.includes(trimmedText)) {
-            finalTranscript += trimmedText + ' ';
-            finalTranscriptRef.current = finalTranscript;
+          if (trimmedText) {
+            // 마지막 추가된 텍스트와 겹치는지 확인 (부분 중복 방지)
+            const lastWords = finalTranscript.trim().split(' ').slice(-5).join(' ');
+            const isOverlap = lastWords && trimmedText.startsWith(lastWords.slice(-20));
+
+            if (!isOverlap && !finalTranscript.includes(trimmedText)) {
+              finalTranscript += trimmedText + ' ';
+              finalTranscriptRef.current = finalTranscript;
+            }
           }
+          // 처리 완료된 결과 인덱스 업데이트
+          processedResultsRef.current = i + 1;
         } else {
           interimTranscript += text;
         }
@@ -245,6 +256,7 @@ export function useVoiceRecorder(): UseVoiceRecorderReturn {
     setError(null);
     finalTranscriptRef.current = '';
     setTranscript('');
+    processedResultsRef.current = 0; // 새 녹음 시작 시 초기화
 
     try {
       // 먼저 마이크 권한 요청
@@ -325,6 +337,7 @@ export function useVoiceRecorder(): UseVoiceRecorderReturn {
     setTranscript('');
     setError(null);
     finalTranscriptRef.current = '';
+    processedResultsRef.current = 0;
   }, [isNative]);
 
   return {

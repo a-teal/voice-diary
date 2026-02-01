@@ -171,7 +171,7 @@ function StatsContent() {
             <p className="text-6xl mb-4">📊</p>
             <p className="text-slate-500">아직 기록이 없어요</p>
             <p className="text-slate-400 text-sm mt-2">
-              첫 번째 일기를 작성해보세요
+              조금 더 남기면 패턴이 보여요
             </p>
           </div>
         ) : (

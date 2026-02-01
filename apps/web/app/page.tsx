@@ -172,12 +172,12 @@ export default function Home() {
             </div>
             <div>
               <h3 className="text-xl font-bold text-slate-800">
-                {isToday ? 'No memories yet' : 'No entry for this day'}
+                {isToday ? '지금 생각나는 거 있어요?' : '이 날의 기록이 없어요'}
               </h3>
               <p className="text-slate-500 text-sm mt-2 max-w-[200px] mx-auto">
                 {isToday
-                  ? 'Capture your day with your voice. Tap the button below.'
-                  : 'There is no diary entry for this date.'}
+                  ? '말만 해요, 남겨줄게요'
+                  : '아직 기록이 없는 날이에요'}
               </p>
             </div>
           </div>

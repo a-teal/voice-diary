@@ -176,7 +176,7 @@ export default function RecordingModal({ isOpen, onClose, onSaved }: RecordingMo
               <div className="flex-1 flex flex-col items-center justify-center text-center">
                 <p className="text-red-500">{error}</p>
                 <p className="text-slate-500 text-sm mt-2">
-                  Please use Chrome, Safari, or Edge browser.
+                  Chrome, Safari, Edge 브라우저를 사용해주세요
                 </p>
               </div>
             )}
@@ -204,7 +204,7 @@ export default function RecordingModal({ isOpen, onClose, onSaved }: RecordingMo
                       {transcript ? (
                         <p className="text-slate-700 text-base leading-relaxed">{transcript}</p>
                       ) : (
-                        <p className="text-slate-400 text-sm animate-pulse">Listening...</p>
+                        <p className="text-slate-400 text-sm animate-pulse">천천히 말해도 돼요...</p>
                       )}
                     </div>
 
@@ -214,7 +214,7 @@ export default function RecordingModal({ isOpen, onClose, onSaved }: RecordingMo
                       className="mt-6 w-full bg-slate-900 text-white py-4 rounded-xl font-semibold shadow-lg hover:bg-black active:scale-95 transition-all flex items-center justify-center gap-2"
                     >
                       <Square className="w-5 h-5 fill-current" />
-                      Stop Recording
+                      여기까지 할게요
                     </button>
                   </div>
                 )}
@@ -224,7 +224,7 @@ export default function RecordingModal({ isOpen, onClose, onSaved }: RecordingMo
                   <div className="flex-1 flex flex-col items-center justify-center space-y-4">
                     <Loader2 className="w-12 h-12 text-indigo-600 animate-spin" />
                     <p className="text-indigo-600 font-medium animate-pulse">
-                      AI is analyzing your mood...
+                      정리하고 있어요...
                     </p>
                   </div>
                 )}
@@ -241,9 +241,9 @@ export default function RecordingModal({ isOpen, onClose, onSaved }: RecordingMo
                         <Check className="w-8 h-8 text-green-600" />
                       </motion.div>
                       <div className="text-center">
-                        <h4 className="text-xl font-bold text-slate-800">Ready to save!</h4>
+                        <h4 className="text-xl font-bold text-slate-800">잘 남겨뒀어요!</h4>
                         <p className="text-slate-500 text-sm mt-1">
-                          Duration: {formatDuration(recordingTime)}
+                          {formatDuration(recordingTime)} 동안 이야기했어요
                         </p>
                       </div>
                     </div>
@@ -251,7 +251,7 @@ export default function RecordingModal({ isOpen, onClose, onSaved }: RecordingMo
                       onClick={handleSave}
                       className="w-full bg-indigo-600 text-white py-4 rounded-xl font-semibold shadow-lg shadow-indigo-200 hover:bg-indigo-700 active:scale-95 transition-all"
                     >
-                      Save Entry
+                      저장하기
                     </button>
                   </div>
                 )}
@@ -260,7 +260,7 @@ export default function RecordingModal({ isOpen, onClose, onSaved }: RecordingMo
                 {state === 'idle' && (
                   <div className="flex-1 flex flex-col items-center justify-center">
                     <Loader2 className="w-8 h-8 text-indigo-600 animate-spin" />
-                    <p className="text-slate-500 mt-2">Starting...</p>
+                    <p className="text-slate-500 mt-2">준비 중...</p>
                   </div>
                 )}
               </div>
