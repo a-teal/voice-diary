@@ -6,6 +6,7 @@ import { Square, X, Loader2, Check } from 'lucide-react';
 import { useVoiceRecorder } from '@/hooks/useVoiceRecorder';
 import { AnalysisResult, DiaryEntry } from '@/types';
 import { saveEntry, generateId } from '@/lib/storage';
+import { Textarea } from '@/components/ui/Textarea';
 
 interface RecordingModalProps {
   isOpen: boolean;
@@ -199,13 +200,15 @@ export default function RecordingModal({ isOpen, onClose, onSaved }: RecordingMo
                       </span>
                     </div>
 
-                    {/* Live transcript area */}
-                    <div className="flex-1 bg-slate-50 rounded-2xl p-4 overflow-y-auto min-h-[200px]">
-                      {transcript ? (
-                        <p className="text-slate-700 text-base leading-relaxed">{transcript}</p>
-                      ) : (
-                        <p className="text-slate-400 text-sm animate-pulse">천천히 말해도 돼요...</p>
-                      )}
+                    {/* Live transcript area - IME-safe Textarea */}
+                    <div className="flex-1 overflow-y-auto min-h-[200px]">
+                      <Textarea
+                        liveText={transcript}
+                        liveMergeMode="replace"
+                        placeholder="천천히 말해도 돼요..."
+                        className="h-full min-h-[200px] bg-slate-50 border-0 focus:ring-0"
+                        readOnly
+                      />
                     </div>
 
                     {/* Stop button */}
