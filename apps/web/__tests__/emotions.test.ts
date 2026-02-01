@@ -30,9 +30,10 @@ describe('emotions', () => {
   describe('EMOTIONS array', () => {
     it('should contain all emotion keys', () => {
       expect(EMOTIONS).toEqual(expect.arrayContaining([
-        'happy', 'grateful', 'excited', 'peaceful',
-        'neutral', 'thoughtful',
-        'sad', 'angry', 'anxious', 'exhausted'
+        'happy', 'excited', 'proud', 'peaceful',
+        'neutral',
+        'sad', 'angry', 'anxious', 'exhausted',
+        'surprised'
       ]));
     });
   });

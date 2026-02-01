@@ -138,13 +138,13 @@ function StatsContent() {
           )}
         </div>
 
-        {/* Emotion filter - emoji only, single line */}
-        <div className="flex gap-2 mt-3 overflow-x-auto pb-2 flex-nowrap">
+        {/* Emotion filter - emoji only, wrap allowed */}
+        <div className="flex flex-wrap gap-2 mt-3">
           {EMOTIONS.map((emotion) => (
             <button
               key={emotion}
               onClick={() => setSelectedEmotion(selectedEmotion === emotion ? null : emotion)}
-              className={`flex-shrink-0 w-10 h-10 rounded-full text-xl flex items-center justify-center transition-all ${
+              className={`w-10 h-10 rounded-full text-xl flex items-center justify-center transition-all ${
                 selectedEmotion === emotion
                   ? 'bg-indigo-100 ring-2 ring-indigo-500'
                   : 'bg-slate-100 opacity-60 hover:opacity-100'

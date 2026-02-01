@@ -98,19 +98,20 @@ ANTHROPIC_API_KEY=sk-ant-xxxxx  # Claude API 키 (필수)
 ## 주요 타입
 
 ```typescript
-// 감정 타입 (10가지: 긍정 4, 중립 2, 부정 4)
+// 감정 타입 (10가지: 긍정 4, 중립 1, 부정 4, 기타 1)
 type Emotion =
-  | 'happy' | 'grateful' | 'excited' | 'peaceful'  // 긍정
-  | 'neutral' | 'thoughtful'                        // 중립
-  | 'sad' | 'angry' | 'anxious' | 'exhausted';      // 부정
-// 😊 행복 | 🥰 감사 | 🤩 신남 | 😌 평온 | 😐 무난 | 🤔 고민 | 😢 슬픔 | 😡 화남 | 😰 불안 | 😫 지침
+  | 'happy' | 'excited' | 'proud' | 'peaceful'  // 긍정
+  | 'neutral'                                    // 중립
+  | 'sad' | 'angry' | 'anxious' | 'exhausted'   // 부정
+  | 'surprised';                                 // 기타
+// 😊 기쁨 | 🤩 설렘 | 🥰 뿌듯 | 😌 평온 | 😐 무난 | 😢 슬픔 | 😡 분노 | 😰 불안 | 😫 지침 | 😲 놀람
 
 interface DiaryEntry {
   id: string;
   date: string;           // YYYY-MM-DD (하루에 여러 개 가능)
   createdAt: string;      // ISO timestamp
   transcript: string;     // 음성 텍스트
-  keywords: string[];     // AI 추출 키워드
+  keywords: string[];     // AI 추출 키워드 (최소 3개)
   emotion: Emotion;       // AI 분석 감정
   summary?: string;       // AI 한줄 요약
 }
