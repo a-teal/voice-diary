@@ -25,16 +25,32 @@ export function isValidEmotion(emotion: string): emotion is Emotion {
 }
 
 export function normalizeEmotion(emotion: string): Emotion {
+  if (!emotion) {
+    console.warn('Empty emotion, fallback to neutral');
+    return 'neutral';
+  }
+
   const lower = emotion.toLowerCase().trim();
-  // 이미 유효한 영어 키인 경우
+
+  // 1) 영어 키 체크 (exact match)
   if (VALID_EMOTIONS.includes(lower as Emotion)) {
     return lower as Emotion;
   }
-  // 한글인 경우 매핑
+
+  // 2) 한글 exact match
   if (EMOTION_KR_TO_EN[emotion]) {
     return EMOTION_KR_TO_EN[emotion];
   }
-  // 기본값
+
+  // 3) 한글 부분 매칭 (startsWith/includes)
+  for (const [kr, en] of Object.entries(EMOTION_KR_TO_EN)) {
+    if (emotion.includes(kr)) {
+      return en;
+    }
+  }
+
+  // 4) 기본값 (로그 추가)
+  console.warn('Unknown emotion, fallback to neutral:', emotion);
   return 'neutral';
 }
 

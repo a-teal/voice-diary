@@ -92,12 +92,23 @@ export async function POST(request: NextRequest) {
     // Parse JSON response
     let result: AnalysisResult;
     try {
+      // Log raw response for debugging
+      console.log('Claude raw response:', content);
+
       // Extract JSON from response (handle markdown code blocks)
       const jsonMatch = content.match(/\{[\s\S]*\}/);
       if (!jsonMatch) {
         throw new Error('JSON not found in response');
       }
-      result = JSON.parse(jsonMatch[0]);
+      const parsed = JSON.parse(jsonMatch[0]);
+
+      // Map new response format to AnalysisResult
+      // emotionKey → emotion, reason → summary
+      result = {
+        keywords: parsed.keywords || [],
+        emotion: normalizeEmotion(parsed.emotionKey || parsed.emotion || ''),
+        summary: parsed.reason || parsed.summary || '오늘의 기록',
+      };
     } catch {
       console.error('Failed to parse AI response:', content);
       return NextResponse.json(
@@ -116,9 +127,7 @@ export async function POST(request: NextRequest) {
         .map(k => String(k).slice(0, 20));
     }
 
-    // 감정 정규화 (한글 → 영어 키, 대소문자 처리)
-    result.emotion = normalizeEmotion(result.emotion || '');
-
+    // Summary 검증
     if (!result.summary || typeof result.summary !== 'string') {
       result.summary = '오늘의 기록';
     } else {

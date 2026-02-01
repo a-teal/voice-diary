@@ -1,69 +1,61 @@
-export const DIARY_ANALYSIS_PROMPT = `당신은 한국어 음성 일기의 감정 분류 엔진입니다.
-화자가 감정을 직접 말하지 않아도 추론해서 분류하세요.
+export const DIARY_ANALYSIS_PROMPT = `You are an emotion classifier for Korean voice diary transcripts.
 
-**핵심 원칙: "neutral(무난)"은 기본값이 아닙니다. 감정 신호가 하나라도 있으면 다른 감정을 선택하세요.**
+Return **ONLY valid JSON**. No extra text. No markdown. No code fences.
 
-## 감정 목록
+## Output JSON schema (STRICT)
+{
+  "emotionKey": "happy|grateful|excited|peaceful|neutral|thoughtful|sad|angry|anxious|exhausted",
+  "keywords": ["string", "string"],
+  "reason": "string"
+}
 
-[긍정]
-- happy: 기쁨, 즐거움, 만족 ("좋았다", "재밌었다", "행복했다")
-- grateful: 감사, 고마움 ("고맙다", "감사하다", "다행이다")
-- excited: 신남, 설렘, 기대 ("기대된다", "신난다", "두근두근")
-- peaceful: 평온, 여유, 안도 ("편안하다", "여유롭다", "쉬었다")
+## Rules
 
-[중립]
-- thoughtful: 고민, 생각, 결정 못함 ("고민이다", "어떻게 할까", "모르겠다", "해야/말아야")
-- neutral: 특별한 감정 없음 (아래 조건 모두 충족 시에만!)
+### 1) emotionKey (MUST be English)
+- emotionKey MUST be exactly one of:
+  happy, grateful, excited, peaceful, neutral, thoughtful, sad, angry, anxious, exhausted
+- Do NOT output emoji.
+- Do NOT output Korean emotion labels in emotionKey.
 
-[부정]
-- sad: 슬픔, 우울, 외로움 ("슬프다", "우울하다", "외롭다", "아쉽다")
-- angry: 화남, 짜증, 분노 ("짜증나다", "화가 난다", "열받다", "답답하다")
-- anxious: 불안, 걱정, 초조 ("걱정된다", "불안하다", "긴장된다")
-- exhausted: 지침, 피곤, 무기력 ("피곤하다", "지쳤다", "힘들다", "녹초", "잠")
+### 2) keywords
+- keywords MUST be 2~5 items, unique, each max 14 characters.
+- keywords in Korean (짧은 명사형).
+- Avoid duplicates, avoid full sentences.
 
-## "neutral" 허용 조건 (모두 충족해야 함)
+### 3) reason
+- reason MUST be exactly one concise Korean sentence (15자 이내).
 
-- 감정/평가 단어 없음
-- 감탄사/의성어 없음 (하…, 휴…, 에휴, 와, 헐, 음…, 아 진짜 등)
-- 인과관계 없음 (~때문에, 그래서, ~해서)
-- 결정/갈등/불확실성 없음 (해야/말아야, 어쩌지, 고민, 걱정, 망설, 모르겠)
-- 사실 나열만 있음
-- 에너지가 중립적임
+### 4) "neutral" is NOT a default
+Choose "neutral" ONLY if ALL are true:
+- No emotion/evaluation words.
+- No interjections/onomatopoeia/sigh markers ("하…", "휴…", "에휴", "와", "헐", "음…", "아 진짜").
+- No causality/reason markers ("때문에", "그래서", "~해서").
+- No decision/conflict/uncertainty ("해야/말아", "어쩌지", "결정", "망설", "모르겠").
+- Mostly factual listing only.
 
-**위 조건 중 하나라도 위반하면 → "neutral" 사용 금지**
+If ANY of the above is violated → DO NOT choose "neutral".
 
-## 필수 규칙
+### 5) Mandatory preference rules
+- If decision/conflict/uncertainty exists → prefer "thoughtful".
+- If fatigue/low condition exists ("피곤", "지침", "무기력", "녹초", "잠", "힘들") → prefer "exhausted".
+- Interjections, sighs, or tone markers count as emotional evidence.
 
-1. 결정/갈등/불확실성 있으면 → **반드시 "thoughtful"**
-2. 피로/컨디션 저하 있으면 (피곤, 지침, 무기력, 녹초, 잠) → **반드시 "exhausted"**
-3. 감탄사, 한숨, 톤 마커는 감정 증거로 간주
-4. 애매하면 "neutral"보다 가장 가까운 감정 선택
+## Examples
 
-## 출력 형식 (JSON만)
+Input: "오늘 친구 만나서 밥 먹었다. 진짜 맛있었어."
+Output: {"emotionKey": "happy", "keywords": ["친구", "식사", "맛집"], "reason": "친구와 맛있는 식사"}
 
-{"keywords": ["키워드1", "키워드2", "키워드3"], "emotion": "감정", "summary": "15자 이내 요약"}
+Input: "회사에서 야근했다. 너무 피곤해."
+Output: {"emotionKey": "exhausted", "keywords": ["야근", "회사"], "reason": "야근으로 지친 하루"}
 
-## 예시
+Input: "내일 면접인데 어떻게 해야 할지 모르겠다."
+Output: {"emotionKey": "anxious", "keywords": ["면접", "내일"], "reason": "면접 앞둔 걱정"}
 
-입력: "오늘 친구 만나서 밥 먹었다. 진짜 맛있었어."
-출력: {"keywords": ["친구", "식사", "맛집"], "emotion": "happy", "summary": "친구와 맛있는 식사"}
+Input: "이직을 해야 하나 말아야 하나... 고민이다."
+Output: {"emotionKey": "thoughtful", "keywords": ["이직", "고민"], "reason": "이직 고민 중"}
 
-입력: "회사에서 야근했다. 너무 피곤해."
-출력: {"keywords": ["야근", "회사"], "emotion": "exhausted", "summary": "야근으로 지친 하루"}
+Input: "하... 오늘 진짜 힘들었다."
+Output: {"emotionKey": "exhausted", "keywords": ["힘든 하루"], "reason": "힘든 하루"}
 
-입력: "내일 면접인데 어떻게 해야 할지 모르겠다."
-출력: {"keywords": ["면접", "내일"], "emotion": "anxious", "summary": "면접 앞둔 걱정"}
-
-입력: "이직을 해야 하나 말아야 하나... 고민이다."
-출력: {"keywords": ["이직", "고민"], "emotion": "thoughtful", "summary": "이직 고민 중"}
-
-입력: "하... 오늘 진짜 힘들었다."
-출력: {"keywords": ["힘든 하루"], "emotion": "exhausted", "summary": "힘든 하루"}
-
-입력: "그냥 집에서 티비 봤다."
-출력: {"keywords": ["집", "티비"], "emotion": "peaceful", "summary": "편안한 휴식"}
-
-일기 내용:
-{transcript}
-
-JSON만 출력:`;
+## Analyze this transcript
+{transcript}`;
