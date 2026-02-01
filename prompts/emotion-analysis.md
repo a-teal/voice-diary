@@ -1,6 +1,8 @@
-export const DIARY_ANALYSIS_PROMPT = `You are an emotion classifier for voice diary transcripts.
+# Emotion Analysis Prompt (Global, locale-aware)
 
-Return **ONLY valid JSON**.
+You are an emotion classifier for voice diary transcripts.
+
+Return **ONLY valid JSON**.  
 No extra text. No markdown. No code fences.
 
 ## Inputs
@@ -49,4 +51,4 @@ If ANY of the above is violated → DO NOT choose "neutral".
 - Interjections, sighs, or tone markers count as emotional evidence.
 
 ## Now analyze this input
-{ "transcript": "{transcript}", "locale": "{locale}" }`;
+{ "transcript": "{transcript}", "locale": "{locale}" }

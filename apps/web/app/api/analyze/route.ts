@@ -38,6 +38,7 @@ export async function POST(request: NextRequest) {
     }
 
     const transcript = sanitizeTranscript(body.transcript);
+    const locale = body.locale === 'en' ? 'en' : 'ko'; // default: ko
 
     // Check API key
     const apiKey = process.env.ANTHROPIC_API_KEY;
@@ -48,7 +49,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const prompt = DIARY_ANALYSIS_PROMPT.replace('{transcript}', transcript);
+    const prompt = DIARY_ANALYSIS_PROMPT
+      .replace('{transcript}', transcript)
+      .replace('{locale}', locale);
 
     // Call Claude API
     const response = await fetch('https://api.anthropic.com/v1/messages', {
