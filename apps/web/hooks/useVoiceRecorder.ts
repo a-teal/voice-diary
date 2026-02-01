@@ -172,6 +172,8 @@ export function useVoiceRecorder(): UseVoiceRecorderReturn {
       console.log('Recognition ended, status:', statusRef.current);
       if (statusRef.current === 'recording') {
         // Android에서 continuous 모드가 불안정하므로 재시작
+        // 재시작 전 인덱스 리셋 (새 세션은 0부터 시작)
+        processedResultsRef.current = 0;
         setTimeout(() => {
           if (statusRef.current === 'recording') {
             try {
@@ -181,7 +183,7 @@ export function useVoiceRecorder(): UseVoiceRecorderReturn {
               console.log('Restart failed:', e);
             }
           }
-        }, 100); // 약간의 딜레이로 안정성 향상
+        }, 100);
       }
     };
 

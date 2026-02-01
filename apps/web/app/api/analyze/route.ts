@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { DIARY_ANALYSIS_PROMPT } from '@/lib/prompts';
 import { AnalysisResult } from '@/types';
 import { checkRateLimit, getClientIdentifier } from '@/lib/rate-limit';
-import { validateTranscript, sanitizeTranscript, isValidEmotion } from '@/lib/validations';
+import { validateTranscript, sanitizeTranscript, normalizeEmotion } from '@/lib/validations';
 
 export async function POST(request: NextRequest) {
   try {
@@ -116,9 +116,8 @@ export async function POST(request: NextRequest) {
         .map(k => String(k).slice(0, 20));
     }
 
-    if (!isValidEmotion(result.emotion)) {
-      result.emotion = 'neutral';
-    }
+    // 감정 정규화 (한글 → 영어 키, 대소문자 처리)
+    result.emotion = normalizeEmotion(result.emotion || '');
 
     if (!result.summary || typeof result.summary !== 'string') {
       result.summary = '오늘의 기록';
