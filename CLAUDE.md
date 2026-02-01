@@ -168,17 +168,17 @@ interface DiaryEntry {
    └── npm run test
    └── 관련 테스트가 있는 경우 실행
 
-4. 배포 (Deploy)
-   └── vercel --prod
-   └── 배포 URL 확인
-
-5. 체크리스트 업데이트 (Checklist Update)
+4. 체크리스트 업데이트 (Checklist Update)
    └── Docs/checklist.md 업데이트 (해당 시)
 
-6. 커밋 (Commit) ⚠️ 필수!
+5. 커밋 (Commit) ⚠️ 필수!
    └── git add <변경된 파일>
    └── git commit -m "type: 설명"
    └── git push
+
+6. 배포 (Deploy) - 필요 시
+   └── vercel --prod
+   └── 배포 URL 확인
 ```
 
 ### 커밋 컨벤션
