@@ -86,21 +86,29 @@ export default function RecordingModal({ isOpen, onClose, onSaved }: RecordingMo
     setState('analyzing');
 
     try {
+      console.log('[ANALYZE] Request starting, transcript length:', transcript.length);
+      console.log('[ANALYZE] Transcript preview:', transcript.slice(0, 100));
+
       const response = await fetch('/api/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ transcript }),
       });
 
+      console.log('[ANALYZE] Response status:', response.status);
+
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error('[ANALYZE] Error response:', errorText);
         throw new Error('Analysis failed');
       }
 
       const analysis: AnalysisResult = await response.json();
+      console.log('[ANALYZE] Success:', JSON.stringify(analysis, null, 2));
       setAnalysisResult(analysis);
       setState('done');
     } catch (err) {
-      console.error('Analysis error:', err);
+      console.error('[ANALYZE] Error:', err);
       // Fallback: save without analysis
       setAnalysisResult({
         keywords: [],

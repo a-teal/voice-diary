@@ -3,6 +3,7 @@ import { DIARY_ANALYSIS_PROMPT } from '@/lib/prompts';
 import { AnalysisResult } from '@/types';
 import { checkRateLimit, getClientIdentifier } from '@/lib/rate-limit';
 import { validateTranscript, sanitizeTranscript, normalizeEmotion } from '@/lib/validations';
+import { EMOTION_MAP } from '@/constants/emotions';
 
 export async function POST(request: NextRequest) {
   try {
@@ -40,6 +41,10 @@ export async function POST(request: NextRequest) {
     const transcript = sanitizeTranscript(body.transcript);
     const locale = body.locale === 'en' ? 'en' : 'ko'; // default: ko
 
+    console.log('[ANALYZE] === Request received ===');
+    console.log('[ANALYZE] Transcript length:', transcript.length);
+    console.log('[ANALYZE] Transcript:', transcript.slice(0, 100));
+
     // Check API key
     const apiKey = process.env.ANTHROPIC_API_KEY;
     if (!apiKey) {
@@ -52,6 +57,8 @@ export async function POST(request: NextRequest) {
     const prompt = DIARY_ANALYSIS_PROMPT
       .replace('{transcript}', transcript)
       .replace('{locale}', locale);
+
+    console.log('[ANALYZE] Prompt length:', prompt.length);
 
     // Call Claude API
     const response = await fetch('https://api.anthropic.com/v1/messages', {
@@ -93,38 +100,45 @@ export async function POST(request: NextRequest) {
     }
 
     // Parse JSON response
-    let result: AnalysisResult;
+    let result: AnalysisResult & { emoji?: string };
     try {
-      // Log raw response for debugging
-      console.log('Claude raw response:', content);
+      // Log raw response for debugging (first 300 chars)
+      console.log('[ANALYZE] Claude raw response:', content.slice(0, 300));
 
       // Extract JSON from response (handle markdown code blocks)
       const jsonMatch = content.match(/\{[\s\S]*\}/);
       if (!jsonMatch) {
-        console.error('JSON not found in response. Full content:', content);
+        console.error('[ANALYZE] JSON not found. Full content:', content);
         throw new Error('JSON not found in response');
       }
 
       const parsed = JSON.parse(jsonMatch[0]);
-      console.log('Parsed JSON:', JSON.stringify(parsed, null, 2));
+      console.log('[ANALYZE] Parsed emotionKey:', parsed.emotionKey);
+      console.log('[ANALYZE] Parsed keywords:', parsed.keywords);
+      console.log('[ANALYZE] Parsed reason:', parsed.reason);
 
       // Map new response format to AnalysisResult
       // emotionKey → emotion, reason → summary
-      // keywords 배열 검증
       let keywords: string[] = [];
       if (Array.isArray(parsed.keywords)) {
         keywords = parsed.keywords.filter((k: unknown) => typeof k === 'string' && k.trim());
       }
-      console.log('Extracted keywords:', keywords);
+
+      const emotion = normalizeEmotion(parsed.emotionKey || parsed.emotion || '');
+      const emoji = EMOTION_MAP[emotion]?.emoji || '😐';
+
+      console.log('[ANALYZE] Normalized emotion:', emotion);
+      console.log('[ANALYZE] Mapped emoji:', emoji);
 
       result = {
         keywords,
-        emotion: normalizeEmotion(parsed.emotionKey || parsed.emotion || ''),
+        emotion,
+        emoji,
         summary: parsed.reason || parsed.summary || '오늘의 기록',
       };
     } catch (parseError) {
-      console.error('Failed to parse AI response:', content);
-      console.error('Parse error:', parseError);
+      console.error('[ANALYZE] Parse failed:', content);
+      console.error('[ANALYZE] Parse error:', parseError);
       return NextResponse.json(
         { error: 'AI 응답을 파싱할 수 없습니다.' },
         { status: 500 }
@@ -158,6 +172,12 @@ export async function POST(request: NextRequest) {
     } else {
       result.summary = result.summary.slice(0, 50);
     }
+
+    console.log('[ANALYZE] === Final result ===');
+    console.log('[ANALYZE] emotion:', result.emotion);
+    console.log('[ANALYZE] emoji:', result.emoji);
+    console.log('[ANALYZE] keywords:', result.keywords);
+    console.log('[ANALYZE] summary:', result.summary);
 
     return NextResponse.json(result, {
       headers: {
