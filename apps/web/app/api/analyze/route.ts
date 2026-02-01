@@ -99,20 +99,31 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Parse JSON response
+    // Parse JSON response with robust fallback
     let result: AnalysisResult & { emoji?: string };
-    try {
-      // Log raw response for debugging (first 300 chars)
-      console.log('[ANALYZE] Claude raw response:', content.slice(0, 300));
 
-      // Extract JSON from response (handle markdown code blocks)
-      const jsonMatch = content.match(/\{[\s\S]*\}/);
-      if (!jsonMatch) {
-        console.error('[ANALYZE] JSON not found. Full content:', content);
-        throw new Error('JSON not found in response');
+    // Safe JSON parsing function
+    const safeParseJSON = (text: string): Record<string, unknown> | null => {
+      try {
+        // Try to extract JSON from response (handle markdown code blocks)
+        const jsonMatch = text.match(/\{[\s\S]*\}/);
+        if (!jsonMatch) {
+          console.error('[ANALYZE] JSON not found. Full content:', text);
+          return null;
+        }
+        return JSON.parse(jsonMatch[0]);
+      } catch (e) {
+        console.error('[ANALYZE] JSON.parse failed:', e);
+        return null;
       }
+    };
 
-      const parsed = JSON.parse(jsonMatch[0]);
+    // Log raw response for debugging
+    console.log('[ANALYZE] Claude raw response:', content.slice(0, 300));
+
+    const parsed = safeParseJSON(content);
+
+    if (parsed) {
       console.log('[ANALYZE] Parsed emotionKey:', parsed.emotionKey);
       console.log('[ANALYZE] Parsed keywords:', parsed.keywords);
       console.log('[ANALYZE] Parsed reason:', parsed.reason);
@@ -121,10 +132,10 @@ export async function POST(request: NextRequest) {
       // emotionKey → emotion, reason → summary
       let keywords: string[] = [];
       if (Array.isArray(parsed.keywords)) {
-        keywords = parsed.keywords.filter((k: unknown) => typeof k === 'string' && k.trim());
+        keywords = (parsed.keywords as unknown[]).filter((k): k is string => typeof k === 'string' && k.trim() !== '');
       }
 
-      const emotion = normalizeEmotion(parsed.emotionKey || parsed.emotion || '');
+      const emotion = normalizeEmotion(String(parsed.emotionKey || parsed.emotion || ''));
       const emoji = EMOTION_MAP[emotion]?.emoji || '😐';
 
       console.log('[ANALYZE] Normalized emotion:', emotion);
@@ -134,15 +145,17 @@ export async function POST(request: NextRequest) {
         keywords,
         emotion,
         emoji,
-        summary: parsed.reason || parsed.summary || '오늘의 기록',
+        summary: String(parsed.reason || parsed.summary || '오늘의 기록'),
       };
-    } catch (parseError) {
-      console.error('[ANALYZE] Parse failed:', content);
-      console.error('[ANALYZE] Parse error:', parseError);
-      return NextResponse.json(
-        { error: 'AI 응답을 파싱할 수 없습니다.' },
-        { status: 500 }
-      );
+    } else {
+      // Fallback result - 앱이 튕기지 않도록 기본값 반환
+      console.warn('[ANALYZE] Using fallback result due to parse failure');
+      result = {
+        keywords: [],
+        emotion: 'neutral',
+        emoji: '😐',
+        summary: transcript.slice(0, 30) + '...',
+      };
     }
 
     // Validate and sanitize result - ensure at least 3 keywords

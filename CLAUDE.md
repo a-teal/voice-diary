@@ -19,7 +19,10 @@ Project Dairy/
 │   ├── ai/               # AI 분석 모듈 (예정)
 │   └── shared/           # 공통 타입, 유틸리티 (예정)
 ├── Docs/                 # 기획 문서
-└── Design/               # 디자인 에셋
+├── Design/               # 디자인 에셋
+└── rules/                # AI 분석 규칙 파일
+    ├── emotion-rules.md  # 감정 분석 규칙
+    └── hashtag-rules.md  # 해시태그 추출 규칙
 ```
 
 ## 기술 스택
@@ -195,9 +198,24 @@ interface DiaryEntry {
 - 배포 후 반드시 커밋
 - 하루 작업 종료 전 모든 변경사항 커밋 확인
 
+## AI 분석 규칙
+
+규칙 파일은 `rules/` 폴더에 위치하며, `prompts.ts`에서 자동 로드됩니다.
+
+### 감정 분석 (emotion-rules.md)
+- 10가지 감정 중 하나 선택 (영어 키만 사용)
+- neutral은 거의 사용하지 않음 (5가지 조건 모두 충족 시에만)
+- 우선순위: exhausted > anxious > angry > sad > surprised > proud > excited > peaceful > happy > neutral
+
+### 해시태그 추출 (hashtag-rules.md)
+- 감정과 독립적으로 추출 (감정이 슬픔이어도 #떡볶이 가능)
+- 구체적 명사 우선: 고유명사 > 행위 > 사물 > 맥락
+- 3~5개, 14자 이내, 소문자
+
 ## 참고 문서
 
 - PRD: `Docs/PRD.md`
 - 체크리스트: `Docs/checklist.md`
 - 프로젝트 계획: `Docs/project_plan.md`
 - 디자인 파일: `Design/` (Figma 익스포트)
+- AI 규칙: `rules/` (emotion-rules.md, hashtag-rules.md)

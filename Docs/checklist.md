@@ -30,6 +30,8 @@
 - [x] 감정 10가지로 정리 (긍정: 행복/감사/신남/평온, 중립: 무난/고민, 부정: 슬픔/화남/불안/지침)
 - [x] 감정 분석 개선 (neutral fallback 문제 수정)
 - [x] 프롬프트 파일 로드 (fs.readFileSync)
+- [x] 규칙 파일 통합 (rules/emotion-rules.md, rules/hashtag-rules.md)
+- [x] 해시태그 추출 개선 (감정 독립, 명사 위주)
 - [x] 모델 업데이트 (claude-3-haiku-20240307)
 - [x] Zod 설치
 
