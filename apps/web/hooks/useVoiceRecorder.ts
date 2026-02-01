@@ -113,16 +113,20 @@ export function useVoiceRecorder(): UseVoiceRecorderReturn {
     recognition.maxAlternatives = 1; // 안드로이드 성능 향상
 
     recognition.onresult = (event: WebSpeechRecognitionEvent) => {
+      console.log('[STT] onresult fired, resultIndex:', event.resultIndex, 'results.length:', event.results.length);
+
       let interimTranscript = '';
       let finalTranscript = finalTranscriptRef.current;
       let hasFinalResult = false;
 
       // 안드로이드 중복 방지: 이미 처리한 결과는 건너뛰기
       const startIndex = Math.max(event.resultIndex, processedResultsRef.current);
+      console.log('[STT] Processing from index:', startIndex, 'processedResults:', processedResultsRef.current);
 
       for (let i = startIndex; i < event.results.length; i++) {
         const result = event.results[i];
         const text = result[0].transcript;
+        console.log('[STT] Result', i, '- isFinal:', result.isFinal, 'text:', text);
 
         if (result.isFinal) {
           const trimmedText = text.trim();
@@ -171,7 +175,7 @@ export function useVoiceRecorder(): UseVoiceRecorderReturn {
     };
 
     recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
-      console.log('Speech recognition error:', event.error);
+      console.log('[STT] onerror fired:', event.error, 'status:', statusRef.current);
 
       if (event.error === 'not-allowed') {
         setError('마이크 접근 권한이 필요합니다.');
@@ -196,19 +200,22 @@ export function useVoiceRecorder(): UseVoiceRecorderReturn {
     };
 
     recognition.onend = () => {
-      console.log('Recognition ended, status:', statusRef.current);
+      console.log('[STT] onend fired, status:', statusRef.current, 'finalTranscript:', finalTranscriptRef.current);
       if (statusRef.current === 'recording') {
         // Android에서 continuous 모드가 불안정하므로 재시작
         // 재시작 전 인덱스 리셋 (새 세션은 0부터 시작)
         processedResultsRef.current = 0;
+        console.log('[STT] Scheduling restart in 100ms...');
         setTimeout(() => {
           if (statusRef.current === 'recording') {
             try {
               recognition.start();
-              console.log('Recognition restarted');
+              console.log('[STT] Recognition restarted successfully');
             } catch (e) {
-              console.log('Restart failed:', e);
+              console.log('[STT] Restart failed:', e);
             }
+          } else {
+            console.log('[STT] Status changed, skipping restart');
           }
         }, 100);
       }
@@ -299,14 +306,15 @@ export function useVoiceRecorder(): UseVoiceRecorderReturn {
       stream.getTracks().forEach(track => track.stop());
 
       setStatus('recording');
+      console.log('[STT] setStatus to recording, starting recognition...');
 
       // 약간의 딜레이 후 시작 (안드로이드 안정성)
       setTimeout(() => {
         try {
           recognitionRef.current?.start();
-          console.log('Speech recognition started');
+          console.log('[STT] recognition.start() called successfully');
         } catch (e) {
-          console.error('Start error:', e);
+          console.error('[STT] Start error:', e);
           // 이미 시작된 경우 무시
           if (e instanceof Error && !e.message.includes('already started')) {
             setError('음성 인식을 시작할 수 없습니다.');

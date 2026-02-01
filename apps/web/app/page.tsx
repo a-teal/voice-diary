@@ -87,8 +87,8 @@ export default function Home() {
                   onClick={() => setSelectedEntry(selectedEntry?.id === entry.id ? null : entry)}
                   className={`flex-shrink-0 flex flex-col items-center p-3 rounded-2xl transition-all ${
                     selectedEntry?.id === entry.id
-                      ? 'bg-indigo-100 ring-2 ring-indigo-400'
-                      : 'bg-white border border-slate-100'
+                      ? 'bg-indigo-50 shadow-[inset_0_0_0_2px_rgb(129,140,248)]'
+                      : 'bg-white shadow-[inset_0_0_0_1px_rgb(226,232,240)]'
                   }`}
                 >
                   <span className="text-2xl">{EMOTION_MAP[entry.emotion].emoji}</span>
