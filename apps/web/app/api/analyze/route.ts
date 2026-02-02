@@ -56,9 +56,11 @@ export async function POST(request: NextRequest) {
     const transcript = sanitizeTranscript(body.transcript);
     const locale = body.locale === 'en' ? 'en' : 'ko'; // default: ko
 
+    console.log('[ANALYZE] ========================================');
     console.log('[ANALYZE] === Request received ===');
     console.log('[ANALYZE] Transcript length:', transcript.length);
-    console.log('[ANALYZE] Transcript:', transcript.slice(0, 100));
+    console.log('[ANALYZE] Full transcript:', transcript);
+    console.log('[ANALYZE] Locale:', locale);
 
     // Check API key
     const apiKey = process.env.ANTHROPIC_API_KEY;
@@ -74,6 +76,8 @@ export async function POST(request: NextRequest) {
       .replace('{locale}', locale);
 
     console.log('[ANALYZE] Prompt length:', prompt.length);
+    console.log('[ANALYZE] Prompt preview:', prompt.slice(0, 500));
+    console.log('[ANALYZE] Prompt contains transcript?', prompt.includes(transcript.slice(0, 20)));
 
     // Call Claude API
     const response = await fetch('https://api.anthropic.com/v1/messages', {
@@ -123,18 +127,26 @@ export async function POST(request: NextRequest) {
         // Try to extract JSON from response (handle markdown code blocks)
         const jsonMatch = text.match(/\{[\s\S]*\}/);
         if (!jsonMatch) {
-          console.error('[ANALYZE] JSON not found. Full content:', text);
+          console.error('[ANALYZE] ✗ JSON not found in response');
+          console.error('[ANALYZE] Full content:', text);
           return null;
         }
-        return JSON.parse(jsonMatch[0]);
+        console.log('[ANALYZE] Extracted JSON string:', jsonMatch[0]);
+        const result = JSON.parse(jsonMatch[0]);
+        console.log('[ANALYZE] ✓ JSON parsed successfully');
+        return result;
       } catch (e) {
-        console.error('[ANALYZE] JSON.parse failed:', e);
+        console.error('[ANALYZE] ✗ JSON.parse failed');
+        console.error('[ANALYZE] Parse error details:', e instanceof Error ? e.message : e);
+        console.error('[ANALYZE] Attempted to parse:', text);
         return null;
       }
     };
 
     // Log raw response for debugging
-    console.log('[ANALYZE] Claude raw response:', content.slice(0, 300));
+    console.log('[ANALYZE] Claude raw response (full):', content);
+    console.log('[ANALYZE] Response type:', typeof content);
+    console.log('[ANALYZE] Response length:', content.length);
 
     const parsed = safeParseJSON(content);
 

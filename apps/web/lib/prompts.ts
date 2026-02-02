@@ -1,27 +1,38 @@
 import fs from 'fs';
 import path from 'path';
 
-// Load rule files from project root
-const emotionRulesPath = path.join(process.cwd(), '..', '..', 'rules', 'emotion-rules.md');
-const hashtagRulesPath = path.join(process.cwd(), '..', '..', 'rules', 'hashtag-rules.md');
-
-// Alternative paths for different environments
-const altEmotionPath = path.join(process.cwd(), 'rules', 'emotion-rules.md');
-const altHashtagPath = path.join(process.cwd(), 'rules', 'hashtag-rules.md');
+// Multiple path candidates for different environments
+const RULE_PATHS = [
+  // Vercel/Next.js production: rules in same directory as app
+  path.join(process.cwd(), 'rules'),
+  // Local development: monorepo root
+  path.join(process.cwd(), '..', '..', 'rules'),
+  // Alternative: relative to __dirname (if available)
+  path.join(__dirname, '..', 'rules'),
+];
 
 let _cachedPrompt: string | null = null;
 
-function loadFile(primaryPath: string, altPath: string): string | null {
-  try {
-    if (fs.existsSync(primaryPath)) {
-      return fs.readFileSync(primaryPath, 'utf-8');
+function loadFile(filename: string): string | null {
+  console.log('[Prompt] Loading file:', filename);
+  console.log('[Prompt] process.cwd():', process.cwd());
+
+  for (const basePath of RULE_PATHS) {
+    const fullPath = path.join(basePath, filename);
+    console.log('[Prompt] Trying path:', fullPath);
+
+    try {
+      if (fs.existsSync(fullPath)) {
+        const content = fs.readFileSync(fullPath, 'utf-8');
+        console.log('[Prompt] ✓ Loaded from:', fullPath, '- length:', content.length);
+        return content;
+      }
+    } catch (error) {
+      console.error('[Prompt] Failed to read:', fullPath, error);
     }
-    if (fs.existsSync(altPath)) {
-      return fs.readFileSync(altPath, 'utf-8');
-    }
-  } catch (error) {
-    console.error('[Prompt] Failed to load file:', error);
   }
+
+  console.error('[Prompt] ✗ File not found in any path:', filename);
   return null;
 }
 
@@ -30,8 +41,8 @@ export function getDiaryAnalysisPrompt(): string {
     return _cachedPrompt;
   }
 
-  const emotionRules = loadFile(emotionRulesPath, altEmotionPath);
-  const hashtagRules = loadFile(hashtagRulesPath, altHashtagPath);
+  const emotionRules = loadFile('emotion-rules.md');
+  const hashtagRules = loadFile('hashtag-rules.md');
 
   if (emotionRules && hashtagRules) {
     console.log('[Prompt] Loaded emotion rules, length:', emotionRules.length);
