@@ -8,7 +8,7 @@ import { Search, X } from 'lucide-react';
 import BottomNav from '@/components/layout/BottomNav';
 import { DiaryEntry, Emotion } from '@/types';
 import { getAllEntries } from '@/lib/storage';
-import { EMOTION_MAP, MOOD_VALUES, EMOTIONS } from '@/constants/emotions';
+import { EMOTION_MAP, MOOD_VALUES, EMOTIONS } from '@/lib/emotion';
 
 function StatsContent() {
   const searchParams = useSearchParams();

@@ -2,8 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { DIARY_ANALYSIS_PROMPT } from '@/lib/prompts';
 import { AnalysisResult } from '@/types';
 import { checkRateLimit, getClientIdentifier } from '@/lib/rate-limit';
-import { validateTranscript, sanitizeTranscript, normalizeEmotion } from '@/lib/validations';
-import { EMOTION_MAP } from '@/constants/emotions';
+import { validateTranscript, sanitizeTranscript, normalizeEmotion, EMOTION_MAP } from '@/lib/emotion';
 import { detectLanguage, hashtagsToKeywords, extractHashtags } from '@/lib/hashtags';
 
 // 감정 단어 블랙리스트 (키워드에서 제외)

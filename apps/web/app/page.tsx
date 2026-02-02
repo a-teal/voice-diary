@@ -10,7 +10,7 @@ import RecordingModal from '@/components/recorder/RecordingModal';
 import { DiaryEntry, Emotion } from '@/types';
 import { getEntriesByDate, updateEntry } from '@/lib/storage';
 import { useSwipe } from '@/hooks/useSwipe';
-import { EMOTION_MAP } from '@/constants/emotions';
+import { EMOTION_MAP } from '@/lib/emotion';
 import { format } from 'date-fns';
 
 export default function Home() {

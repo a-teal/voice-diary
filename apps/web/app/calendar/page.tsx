@@ -8,7 +8,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import BottomNav from '@/components/layout/BottomNav';
 import { DiaryEntry } from '@/types';
 import { getEntriesByMonth } from '@/lib/storage';
-import { EMOTION_MAP } from '@/constants/emotions';
+import { EMOTION_MAP } from '@/lib/emotion';
 
 export default function CalendarPage() {
   const router = useRouter();

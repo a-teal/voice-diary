@@ -1,5 +1,11 @@
 # PRD: Voice Diary (음성 일기 서비스)
 
+> **최종 업데이트**: 2025-01-27
+>
+> 이 문서는 서비스 전체 기획서입니다. 개발 진행 상황은 [checklist.md](./checklist.md)를 참고하세요.
+
+---
+
 ## 1. 개요
 
 ### 1.1 프로젝트 요약
@@ -14,6 +20,15 @@
 - 일기를 쓰고 싶지만 귀찮아서 포기하는 사람
 - 자신의 감정 패턴을 파악하고 싶은 사람
 - 빠르고 간편한 기록을 원하는 직장인/학생
+
+### 1.4 배포 현황
+
+| 플랫폼 | 상태 | URL |
+|--------|------|-----|
+| Web | ✅ 운영 중 | https://voice-diary-eta.vercel.app |
+| GitHub | ✅ 운영 중 | https://github.com/a-teal/voice-diary |
+| iOS | 🔄 개발 중 | Xcode 프로젝트 생성됨 |
+| Android | 🔄 개발 중 | Android Studio 프로젝트 생성됨 |
 
 ---
 
@@ -46,7 +61,7 @@
 ### 3.2 AI 분석
 | 기능 | 설명 | 우선순위 |
 |------|------|----------|
-| 키워드 추출 | 일기에서 핵심 키워드 3-5개 추출 | P0 |
+| 키워드 추출 | 일기에서 핵심 키워드 3-6개 추출 | P0 |
 | 감정 분석 | 대표 감정 이모지 1개 자동 선택 | P0 |
 | 요약 생성 | 한 줄 요약 자동 생성 | P1 |
 
@@ -61,49 +76,52 @@
 
 ---
 
-## 4. 상세 기능 명세
+## 4. 데이터 모델
 
-### 4.1 음성 녹음 플로우
-```
-[메인 화면] → [녹음 버튼 클릭] → [녹음 중...] → [완료 버튼]
-                                                    ↓
-                              [STT 변환 중...] → [텍스트 확인/편집]
-                                                    ↓
-                              [AI 분석 중...] → [결과 표시 + 저장]
-```
+### 4.1 감정 타입 (10가지)
 
-### 4.2 감정 이모지 세트 (10개)
-| 이모지 | 감정 | 설명 |
-|--------|------|------|
-| 😊 | 기쁨 | 행복, 즐거움, 만족 |
-| 😢 | 슬픔 | 우울, 외로움, 아쉬움 |
-| 😠 | 분노 | 화남, 짜증, 불만 |
-| 😰 | 불안 | 걱정, 초조, 긴장 |
-| 😌 | 평온 | 차분함, 편안함 |
-| 😴 | 피곤 | 지침, 무기력 |
-| 🤔 | 고민 | 생각이 많음, 복잡함 |
-| 😎 | 자신감 | 뿌듯함, 성취감 |
-| 🥰 | 사랑 | 애정, 감사, 따뜻함 |
-| 😐 | 무덤덤 | 특별한 감정 없음 |
+| 카테고리 | 영어 키 | 이모지 | 한글 | 설명 |
+|----------|---------|--------|------|------|
+| 긍정 | happy | 😊 | 기쁨 | 행복, 즐거움, 만족 |
+| 긍정 | excited | 🤩 | 설렘 | 기대, 신남 |
+| 긍정 | proud | 🥰 | 뿌듯 | 성취감, 감사 |
+| 긍정 | peaceful | 😌 | 평온 | 차분함, 편안함 |
+| 중립 | neutral | 😐 | 무난 | 특별한 감정 없음 |
+| 부정 | sad | 😢 | 슬픔 | 우울, 외로움, 아쉬움 |
+| 부정 | angry | 😡 | 분노 | 화남, 짜증, 불만 |
+| 부정 | anxious | 😰 | 불안 | 걱정, 초조, 긴장 |
+| 부정 | exhausted | 😫 | 지침 | 피곤, 무기력 |
+| 기타 | surprised | 😲 | 놀람 | 깜짝, 충격 |
 
-### 4.3 데이터 모델
+### 4.2 일기 엔트리
+
 ```typescript
 interface DiaryEntry {
   id: string;
-  createdAt: Date;
+  date: string;           // YYYY-MM-DD (하루에 여러 개 가능)
+  createdAt: string;      // ISO timestamp
+  transcript: string;     // 음성 → 텍스트
+  keywords: string[];     // AI 추출 해시태그 (3-6개, 감정 제외)
+  emotion: Emotion;       // AI 분석 감정 (원본)
+  summary?: string;       // AI 한줄 요약
 
-  // 원본 데이터
-  transcript: string;     // STT 변환 텍스트
+  // 감정 교정 필드 (B 준비용)
+  isCorrected?: boolean;       // 사용자가 감정을 교정했는지
+  correctedEmotion?: Emotion;  // 교정된 감정 (원본 유지)
+  correctedAt?: string;        // 교정 시각
 
-  // AI 분석 결과
-  keywords: string[];     // 키워드 3-5개
-  emotion: string;        // 감정 이모지
-  summary?: string;       // 한 줄 요약
+  editedAt?: string;
+  syncedAt?: string;      // 클라우드 동기화 시간
+}
+```
 
-  // 메타데이터
-  userId?: string;        // 로그인 시에만 (로컬 저장은 없음)
-  editedAt?: Date;
-  syncedAt?: Date;        // 클라우드 동기화 시간
+### 4.3 AI 분석 응답
+
+```typescript
+interface AnalysisResult {
+  keywords: string[];     // 3-6개
+  emotion: Emotion;       // 10가지 중 1개
+  summary: string;        // 한 줄 요약
 }
 ```
 
@@ -111,78 +129,162 @@ interface DiaryEntry {
 
 ## 5. 화면 구성
 
-### 5.1 메인 화면 (일간 뷰)
-- 상단: 날짜 네비게이션 (< 오늘 >)
-- 중앙: 오늘의 일기 카드
-  - 감정 이모지 (크게)
-  - 키워드 태그들
-  - 일기 텍스트 (접기/펼치기)
-- 하단: 녹음 버튼 (FAB)
+### 5.1 일간 뷰 (메인 화면)
+**경로**: `/`
 
-### 5.2 월간 캘린더 뷰
-- 캘린더 그리드
-- 각 날짜에 감정 이모지 표시
-- 날짜 클릭 시 해당 일기로 이동
+**구성 요소**:
+- 헤더: 날짜 표시 (< 2025년 1월 26일 일요일 >)
+- 일기 카드 (있을 때)
+  - 감정 이모지 (크게, 클릭 시 수정 가능)
+  - 키워드 태그 (최대 6개, 클릭 시 통계 검색)
+  - 일기 내용 텍스트 (접기/펼치기)
+  - 시간 표시
+- 빈 상태 (없을 때)
+  - 꿀단지 일러스트
+  - "지금 생각나는 거 있어요?" 문구
+- FAB (녹음 버튼) - 하단 중앙
 
-### 5.3 통계 뷰
-- 이번 달 감정 분포 (파이 차트)
-- 감정 변화 추이 (라인 차트)
-- 자주 나온 키워드 (워드 클라우드)
+**인터랙션**:
+- 좌우 스와이프로 날짜 이동
+- 이모지 클릭 → 10개 감정 선택 팝업
+
+### 5.2 녹음 모달
+**트리거**: FAB 클릭 시 바텀시트로 등장
+
+**구성 요소**:
+- 헤더: "오늘의 일기" + 닫기 버튼
+- 텍스트 영역: 실시간 음성→텍스트 표시
+- 녹음 버튼 (녹음 중: 펄스 애니메이션)
+- 녹음 시간 표시
+- 완료 버튼
+- 로딩 상태: "AI가 분석 중..." + 스피너
+
+**상태**:
+1. 대기 (idle)
+2. 녹음 중 (recording)
+3. AI 분석 중 (analyzing)
+4. 완료/에러
+
+### 5.3 월간 캘린더 뷰
+**경로**: `/calendar`
+
+**구성 요소**:
+- 헤더: 월 표시 (< 2025년 1월 >)
+- 요일 표시 (일~토)
+- 날짜 그리드 (7x6)
+  - 오늘 날짜 하이라이트
+  - 일기 있는 날: 대표 감정 이모지 표시
+  - 하루 여러 일기: 개수 표시
+
+**인터랙션**:
+- 날짜 클릭 → 일간 뷰로 이동
+- 좌우 스와이프/화살표로 월 이동
+
+### 5.4 통계 뷰
+**경로**: `/stats`
+
+**구성 요소**:
+- 기간 선택 탭: 7일 / 30일
+- 감정 변화 그래프 (라인 차트)
+- 감정별 필터링
+- 키워드 클라우드
+- 키워드 검색
+- URL 파라미터 검색 연동 (?search=키워드)
+
+### 5.5 하단 네비게이션
+**위치**: 모든 화면 하단 고정
+
+**탭 구성**:
+1. 일간 (홈 아이콘)
+2. 월간 (캘린더 아이콘)
+3. 통계 (차트 아이콘)
 
 ---
 
 ## 6. 기술 스택
 
 ### 6.1 프론트엔드
-| 기술 | 선택 이유 |
-|------|-----------|
-| Next.js 15.3.4 | App Router, 정적 빌드 지원 |
-| TypeScript | 타입 안정성 |
-| Tailwind CSS v4 | 빠른 스타일링 |
-| Capacitor | iOS/Android 네이티브 앱 |
-| lucide-react | 아이콘 라이브러리 |
-| framer-motion | 애니메이션 |
-| recharts | 차트 시각화 |
+| 기술 | 버전 | 용도 |
+|------|------|------|
+| Next.js | 15.3.4 | App Router, 정적 빌드 |
+| TypeScript | 5.x | 타입 안정성 |
+| Tailwind CSS | v4 | 스타일링 |
+| Capacitor | - | iOS/Android 네이티브 앱 |
+| lucide-react | - | 아이콘 |
+| framer-motion | - | 애니메이션 |
+| date-fns | - | 날짜 포맷 |
+| recharts | - | 차트 시각화 |
+| sonner | - | 토스트 알림 |
 
 ### 6.2 백엔드/인프라
-| 기술 | 선택 이유 |
-|------|-----------|
-| Supabase | Auth + DB + Storage 통합 |
-| PostgreSQL | 구조화된 데이터 저장 |
-| Vercel | Next.js 최적화 호스팅 |
+| 기술 | 용도 |
+|------|------|
+| Vercel | Next.js 호스팅 |
+| Supabase (예정) | Auth + DB + Storage |
 
 ### 6.3 AI/음성
-| 기술 | 선택 이유 |
-|------|-----------|
-| Web Speech API | 무료, 실시간 타이핑 UX |
-| Claude API | 키워드/감정 분석 |
-
-> **참고**: 초기에는 Web Speech API(무료)로 시작. 정확도 이슈 발생 시 Whisper로 업그레이드 검토.
+| 기술 | 용도 |
+|------|------|
+| Web Speech API | 웹 브라우저 STT (무료) |
+| Capacitor Speech Recognition | 네이티브 앱 STT |
+| Claude API (Haiku) | 키워드/감정 분석 |
 
 ---
 
-## 7. 개발 단계
+## 7. 프로젝트 구조
+
+```
+Project Dairy/
+├── apps/
+│   ├── web/              # Next.js 웹앱
+│   │   ├── app/          # App Router
+│   │   │   ├── page.tsx          # 메인 (일간 뷰)
+│   │   │   ├── calendar/         # 월간 캘린더
+│   │   │   ├── stats/            # 통계
+│   │   │   └── api/analyze/      # AI 분석 API
+│   │   ├── components/
+│   │   │   ├── layout/           # Header, BottomNav
+│   │   │   ├── diary/            # EntryCard
+│   │   │   ├── recorder/         # RecordingModal
+│   │   │   └── stats/            # EmotionChart, KeywordCloud
+│   │   ├── hooks/                # useVoiceRecorder, useSwipe
+│   │   ├── lib/                  # 유틸리티
+│   │   │   ├── emotion.ts        # 감정 상수/매핑/검증
+│   │   │   ├── hashtags.ts       # 해시태그 엔진
+│   │   │   ├── prompts.ts        # AI 프롬프트
+│   │   │   └── storage.ts        # localStorage
+│   │   ├── types/                # TypeScript 타입
+│   │   ├── __tests__/            # Jest 테스트
+│   │   ├── ios/                  # Capacitor iOS
+│   │   └── android/              # Capacitor Android
+│   └── mobile/           # (예정)
+├── Docs/                 # 기획 문서
+│   ├── PRD.md           # 서비스 전체 기획서 (이 파일)
+│   └── checklist.md     # 개발 체크리스트
+├── Design/               # 디자인 에셋
+└── rules/                # AI 분석 규칙
+    ├── emotion-rules.md  # 감정 분석 규칙
+    └── hashtag-rules.md  # 해시태그 추출 규칙
+```
+
+---
+
+## 8. 개발 단계
 
 ### Phase 1: MVP 핵심 기능 ✅ 완료
-**목표**: 음성으로 일기 쓰고 AI 분석 결과 보기
-
 - [x] 프로젝트 셋업 (Next.js + 모노레포)
-- [x] 음성 녹음 + 실시간 STT (Web Speech API)
+- [x] 음성 녹음 + 실시간 STT
 - [x] AI 분석 API 연동 (Claude)
 - [x] 일간 뷰 UI
 - [x] 로컬 저장 (localStorage)
 
 ### Phase 2: 시각화 ✅ 완료
-**목표**: 감정 패턴을 시각적으로 파악
-
 - [x] 월간 캘린더 뷰
 - [x] 키워드 클라우드
-- [x] 감정 변화 그래프 (Recharts)
+- [x] 감정 변화 그래프
 - [x] 날짜 네비게이션 (스와이프)
 
 ### Phase 3: 모바일 앱 🔄 진행 중
-**목표**: iOS/Android 네이티브 앱
-
 - [x] Capacitor 설정
 - [x] iOS/Android 프로젝트 생성
 - [x] 네이티브 음성인식 플러그인
@@ -191,8 +293,6 @@ interface DiaryEntry {
 - [ ] 앱 스토어 배포
 
 ### Phase 4: 고도화 (예정)
-**목표**: 사용성 개선 및 기능 확장
-
 - [ ] 연간 통계 뷰
 - [ ] 일기 수정/삭제 기능
 - [ ] 로그인 + 클라우드 동기화 (Supabase)
@@ -201,16 +301,52 @@ interface DiaryEntry {
 
 ---
 
-## 8. 성공 지표 (KPI)
+## 9. 디자인 시스템
 
-### 8.1 사용자 지표
+### 9.1 컬러
+```
+Primary: #6366F1 (indigo-600)
+Primary Light: #818CF8
+Background: #F8FAFC (slate-50)
+Surface: #FFFFFF
+Text Primary: #1E293B (slate-800)
+Text Secondary: #64748B (slate-500)
+Border: #E2E8F0 (slate-200)
+Success: #22C55E
+Error: #EF4444
+```
+
+### 9.2 타이포그래피
+```
+Heading 1: 24px / Bold
+Heading 2: 20px / SemiBold
+Body: 16px / Regular
+Caption: 14px / Regular
+Small: 12px / Regular
+```
+
+### 9.3 컴포넌트 스타일
+- 카드: `rounded-2xl shadow-sm border border-slate-100`
+- 버튼: `rounded-xl` (primary: bg-indigo-600)
+- 아이콘: lucide-react 사용
+
+### 9.4 접근성
+- 터치 타겟: 최소 44x44px
+- 색상 대비: WCAG AA 이상
+- 이모지에 대체 텍스트 제공
+
+---
+
+## 10. 성공 지표 (KPI)
+
+### 10.1 사용자 지표
 | 지표 | 목표 |
 |------|------|
 | DAU (Daily Active Users) | 출시 1개월 후 100명 |
 | 리텐션 (D7) | 30% 이상 |
 | 평균 기록 빈도 | 주 3회 이상 |
 
-### 8.2 제품 지표
+### 10.2 제품 지표
 | 지표 | 목표 |
 |------|------|
 | 평균 기록 시간 | 1분 이내 |
@@ -219,7 +355,7 @@ interface DiaryEntry {
 
 ---
 
-## 9. 향후 확장 가능성
+## 11. 향후 확장 가능성
 
 - **음성 AI 대화**: 녹음 후 AI와 대화하며 일기 보완
 - **감정 패턴 알림**: "최근 스트레스가 높아요" 알림
@@ -229,23 +365,12 @@ interface DiaryEntry {
 
 ---
 
-## 10. 결정 사항
+## 12. 결정 사항
 
 | 이슈 | 결정 | 비고 |
 |------|------|------|
 | 플랫폼 | ✅ 웹 + 네이티브 앱 | Capacitor로 iOS/Android 지원 |
-| 음성 변환 | ✅ Web Speech API + Capacitor Speech Recognition | 웹/네이티브 통합 |
-| 로그인 | ✅ 필수 아님 | 로컬 저장 기본, 로그인 시 클라우드 동기화 |
+| 음성 변환 | ✅ Web Speech API + Capacitor | 웹/네이티브 통합 |
+| 로그인 | ✅ 필수 아님 | 로컬 저장 기본, 로그인 시 동기화 |
 | 수익 모델 | ✅ 보류 | MVP 이후 검토 |
 | 음성 파일 저장 | ✅ 저장 안함 | 텍스트 변환 후 삭제 |
-
----
-
-## 11. 배포 현황
-
-| 플랫폼 | 상태 | URL |
-|--------|------|-----|
-| Web | ✅ 운영 중 | https://voice-diary-eta.vercel.app |
-| GitHub | ✅ 운영 중 | https://github.com/a-teal/voice-diary |
-| iOS | 🔄 개발 중 | Xcode 프로젝트 생성됨 |
-| Android | 🔄 개발 중 | Android Studio 프로젝트 생성됨 |

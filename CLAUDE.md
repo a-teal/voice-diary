@@ -59,8 +59,11 @@ apps/web/
 │   └── stats/             # EmotionChart, KeywordCloud
 ├── hooks/                 # 커스텀 훅 (useVoiceRecorder, useSwipe)
 ├── lib/                   # 유틸리티
+│   ├── emotion.ts         # 감정 상수/매핑/검증 (통합)
+│   ├── hashtags.ts        # 해시태그 엔진
+│   ├── prompts.ts         # AI 프롬프트
+│   └── storage.ts         # localStorage
 ├── types/                 # TypeScript 타입
-├── constants/             # 상수 (감정 이모지 등)
 ├── __tests__/             # 테스트
 ├── ios/                   # Capacitor iOS 프로젝트
 ├── android/               # Capacitor Android 프로젝트
@@ -221,8 +224,7 @@ interface DiaryEntry {
 
 ## 참고 문서
 
-- PRD: `Docs/PRD.md`
-- 체크리스트: `Docs/checklist.md`
-- 프로젝트 계획: `Docs/project_plan.md`
+- PRD: `Docs/PRD.md` (서비스 전체 기획서)
+- 체크리스트: `Docs/checklist.md` (개발 진행 상황)
 - 디자인 파일: `Design/` (Figma 익스포트)
 - AI 규칙: `rules/` (emotion-rules.md, hashtag-rules.md)

@@ -11,7 +11,7 @@ import {
   ReferenceLine,
 } from 'recharts';
 import { DiaryEntry } from '@/types';
-import { EMOTION_MAP, MOOD_VALUES } from '@/constants/emotions';
+import { EMOTION_MAP, MOOD_VALUES } from '@/lib/emotion';
 
 interface EmotionChartProps {
   entries: DiaryEntry[];

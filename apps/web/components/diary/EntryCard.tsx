@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Clock, ChevronDown, ChevronUp, X } from 'lucide-react';
 import { DiaryEntry, Emotion } from '@/types';
-import { EMOTION_MAP, EMOTIONS } from '@/constants/emotions';
+import { EMOTION_MAP, EMOTIONS } from '@/lib/emotion';
 
 interface EntryCardProps {
   entry: DiaryEntry;
