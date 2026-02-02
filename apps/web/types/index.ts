@@ -23,9 +23,14 @@ export interface DiaryEntry {
 
   transcript: string;     // 음성 → 텍스트
 
-  keywords: string[];     // AI 추출 키워드
-  emotion: Emotion;       // AI 분석 감정
+  keywords: string[];     // AI 추출 해시태그 (3-6개)
+  emotion: Emotion;       // AI 분석 감정 (원본)
   summary?: string;       // AI 한줄 요약
+
+  // B 준비용 교정 필드
+  isCorrected?: boolean;         // 사용자가 감정을 교정했는지
+  correctedEmotion?: Emotion;    // 교정된 감정 (원본 emotion은 유지)
+  correctedAt?: string;          // 교정 시각
 
   editedAt?: string;
   syncedAt?: string;

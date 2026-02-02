@@ -2,21 +2,40 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Clock, ChevronDown, ChevronUp, X } from 'lucide-react';
-import { DiaryEntry } from '@/types';
-import { EMOTION_MAP } from '@/constants/emotions';
+import { DiaryEntry, Emotion } from '@/types';
+import { EMOTION_MAP, EMOTIONS } from '@/constants/emotions';
 
 interface EntryCardProps {
   entry: DiaryEntry;
   compact?: boolean;
   onClose?: () => void;
+  onEmotionCorrect?: (entryId: string, newEmotion: Emotion) => void;
 }
 
-export default function EntryCard({ entry, compact = false, onClose }: EntryCardProps) {
+export default function EntryCard({ entry, compact = false, onClose, onEmotionCorrect }: EntryCardProps) {
   const router = useRouter();
   const [isExpanded, setIsExpanded] = useState(false);
-  const emotionData = EMOTION_MAP[entry.emotion];
+  const [showEmotionPicker, setShowEmotionPicker] = useState(false);
+
+  // Use corrected emotion if available, otherwise use original
+  const displayEmotion = entry.correctedEmotion || entry.emotion;
+  const emotionData = EMOTION_MAP[displayEmotion];
+
+  const handleEmotionClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onEmotionCorrect) {
+      setShowEmotionPicker(!showEmotionPicker);
+    }
+  };
+
+  const handleEmotionSelect = (newEmotion: Emotion) => {
+    if (onEmotionCorrect && newEmotion !== displayEmotion) {
+      onEmotionCorrect(entry.id, newEmotion);
+    }
+    setShowEmotionPicker(false);
+  };
 
   const handleHashtagClick = (keyword: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -71,7 +90,45 @@ export default function EntryCard({ entry, compact = false, onClose }: EntryCard
     >
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
-          <span className="text-4xl filter drop-shadow-sm">{emotionData.emoji}</span>
+          <div className="relative">
+            <button
+              onClick={handleEmotionClick}
+              className={`text-4xl filter drop-shadow-sm transition-transform ${onEmotionCorrect ? 'hover:scale-110 cursor-pointer' : ''}`}
+              title={onEmotionCorrect ? '감정 수정하기' : undefined}
+            >
+              {emotionData.emoji}
+            </button>
+            {entry.isCorrected && (
+              <span className="absolute -top-1 -right-1 w-3 h-3 bg-indigo-500 rounded-full border-2 border-white" title="수정됨" />
+            )}
+
+            {/* Emotion Picker */}
+            <AnimatePresence>
+              {showEmotionPicker && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9, y: -10 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.9, y: -10 }}
+                  className="absolute top-full left-0 mt-2 z-50 bg-white rounded-xl shadow-lg border border-slate-200 p-2 grid grid-cols-5 gap-1"
+                >
+                  {EMOTIONS.map((emotion) => (
+                    <button
+                      key={emotion}
+                      onClick={() => handleEmotionSelect(emotion)}
+                      className={`text-2xl p-2 rounded-lg transition-colors ${
+                        emotion === displayEmotion
+                          ? 'bg-indigo-100'
+                          : 'hover:bg-slate-100'
+                      }`}
+                      title={EMOTION_MAP[emotion].labelKo}
+                    >
+                      {EMOTION_MAP[emotion].emoji}
+                    </button>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
           <div>
             <div className="flex items-center gap-2">
               <span className="font-bold text-slate-800">{emotionData.labelKo}</span>

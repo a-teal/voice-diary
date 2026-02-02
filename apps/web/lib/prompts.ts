@@ -60,7 +60,7 @@ Return **ONLY valid JSON**. No extra text. No markdown. No code fences.
 ## Output JSON schema (STRICT)
 {
   "emotionKey": "happy|excited|proud|peaceful|neutral|sad|angry|anxious|exhausted|surprised",
-  "keywords": ["string", "string", "string"],
+  "keywords": ["string", "string", "string", "string"],
   "reason": "string"
 }
 
@@ -81,15 +81,20 @@ ${cleanHashtag}
 ## CRITICAL REMINDERS
 
 1. **emotionKey**: MUST be exactly one of the 10 English keys. Never output Korean or emoji.
+   - Priority: exhausted > anxious > angry > sad > surprised > proud > excited > peaceful > happy > neutral
+   - neutral은 거의 사용하지 않음 (순수한 사실 나열만 있을 때만)
 
-2. **keywords**: Extract 3-5 CONCRETE nouns from the diary content.
-   - Focus on: people, places, food, objects, activities
-   - DO NOT base keywords on the detected emotion
-   - Example: If someone is sad but talked about "coffee" and "meeting", use ["커피", "회의"] not ["슬픔", "우울"]
+2. **keywords**: Extract 3-6 CONCRETE nouns from the diary content.
+   - NO # symbol (just the words)
+   - Focus on: Event/Action(필수), Topic/Entity, Outcome/Decision
+   - NEVER include emotion words (행복, 슬픔, 불안, happy, sad, etc.)
+   - NEVER include generic words (하루, 일상, 기록, today, daily, life)
+   - Example: "오늘 강남역에서 친구랑 떡볶이 먹었다" → ["강남역", "친구", "떡볶이"]
+   - NOT: ["기쁨", "만남", "일상"]
 
 3. **reason**: One sentence summary in the locale language (Korean if locale=ko)
 
-4. **neutral is almost NEVER correct**: If there's ANY emotional hint, interjection, or uncertainty → NOT neutral.
+4. **Language consistency**: All keywords must be in the same language as the transcript.
 
 ## Now analyze this input
 { "transcript": "{transcript}", "locale": "{locale}" }`;
@@ -103,19 +108,21 @@ Return **ONLY valid JSON**. No extra text. No markdown. No code fences.
 ## Output JSON schema (STRICT)
 {
   "emotionKey": "happy|excited|proud|peaceful|neutral|sad|angry|anxious|exhausted|surprised",
-  "keywords": ["string", "string", "string"],
+  "keywords": ["string", "string", "string", "string"],
   "reason": "string"
 }
 
 ## Rules
 
-### emotionKey - MUST be one of:
-happy, excited, proud, peaceful, neutral, sad, angry, anxious, exhausted, surprised
+### emotionKey - MUST be one of (priority order):
+exhausted > anxious > angry > sad > surprised > proud > excited > peaceful > happy > neutral
+- neutral은 거의 사용하지 않음 (순수한 사실 나열만 있을 때만)
 
-### keywords - MUST be 3~5 concrete nouns
-- Extract actual things mentioned: people, places, food, objects, activities
-- DO NOT extract emotional words as keywords
+### keywords - MUST be 3-6 concrete nouns
+- NO # symbol, NO emotion words, NO generic words
+- Focus on: Event/Action(필수 1개 이상), Topic/Entity, Outcome/Decision
 - Example: "카페에서 친구 만났다" → ["카페", "친구"] (NOT ["기쁨", "만남"])
+- NEVER: 하루, 일상, 기록, 행복, 슬픔, 불안, today, daily, life
 
 ### reason - One concise sentence summary
 
@@ -124,18 +131,6 @@ happy, excited, proud, peaceful, neutral, sad, angry, anxious, exhausted, surpri
 - Any uncertainty (해야, 어쩌지, 모르겠) → anxious, NOT neutral
 - Any fatigue mention (피곤, 지침) → exhausted, NOT neutral
 - Any complaint (짜증, 답답) → angry, NOT neutral
-
-### Emotion preference hierarchy
-1. Fatigue → exhausted
-2. Uncertainty/worry → anxious
-3. Frustration → angry
-4. Sadness → sad
-5. Unexpected → surprised
-6. Achievement → proud
-7. Anticipation → excited
-8. Calm → peaceful
-9. Joy → happy
-10. Pure factual only → neutral (very rare)
 
 ## Now analyze this input
 { "transcript": "{transcript}", "locale": "{locale}" }`;

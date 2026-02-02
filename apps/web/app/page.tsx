@@ -7,8 +7,8 @@ import Header from '@/components/layout/Header';
 import BottomNav from '@/components/layout/BottomNav';
 import EntryCard from '@/components/diary/EntryCard';
 import RecordingModal from '@/components/recorder/RecordingModal';
-import { DiaryEntry } from '@/types';
-import { getEntriesByDate } from '@/lib/storage';
+import { DiaryEntry, Emotion } from '@/types';
+import { getEntriesByDate, updateEntry } from '@/lib/storage';
 import { useSwipe } from '@/hooks/useSwipe';
 import { EMOTION_MAP } from '@/constants/emotions';
 import { format } from 'date-fns';
@@ -58,6 +58,31 @@ export default function Home() {
     setCurrentDate(new Date());
   };
 
+  const handleEmotionCorrect = (entryId: string, newEmotion: Emotion) => {
+    // Update in storage with correction fields
+    updateEntry(entryId, {
+      isCorrected: true,
+      correctedEmotion: newEmotion,
+      correctedAt: new Date().toISOString(),
+    });
+
+    // Update local state
+    setEntries(prev =>
+      prev.map(entry =>
+        entry.id === entryId
+          ? { ...entry, isCorrected: true, correctedEmotion: newEmotion, correctedAt: new Date().toISOString() }
+          : entry
+      )
+    );
+
+    // Update selected entry if it's the one being corrected
+    if (selectedEntry?.id === entryId) {
+      setSelectedEntry(prev =>
+        prev ? { ...prev, isCorrected: true, correctedEmotion: newEmotion, correctedAt: new Date().toISOString() } : null
+      );
+    }
+  };
+
   const isToday = currentDate.toDateString() === new Date().toDateString();
 
   return (
@@ -81,27 +106,37 @@ export default function Home() {
           <div className="space-y-4">
             {/* Emotion summary for the day */}
             <div className="flex gap-2 overflow-x-auto pb-2">
-              {entries.map((entry) => (
-                <button
-                  key={entry.id}
-                  onClick={() => setSelectedEntry(selectedEntry?.id === entry.id ? null : entry)}
-                  className={`flex-shrink-0 flex flex-col items-center p-3 rounded-2xl transition-all ${
-                    selectedEntry?.id === entry.id
-                      ? 'bg-indigo-50 shadow-[inset_0_0_0_2px_rgb(129,140,248)]'
-                      : 'bg-white shadow-[inset_0_0_0_1px_rgb(226,232,240)]'
-                  }`}
-                >
-                  <span className="text-2xl">{EMOTION_MAP[entry.emotion].emoji}</span>
-                  <span className="text-xs text-slate-500 mt-1">
-                    {format(new Date(entry.createdAt), 'HH:mm')}
-                  </span>
-                </button>
-              ))}
+              {entries.map((entry) => {
+                const displayEmotion = entry.correctedEmotion || entry.emotion;
+                return (
+                  <button
+                    key={entry.id}
+                    onClick={() => setSelectedEntry(selectedEntry?.id === entry.id ? null : entry)}
+                    className={`flex-shrink-0 flex flex-col items-center p-3 rounded-2xl transition-all relative ${
+                      selectedEntry?.id === entry.id
+                        ? 'bg-indigo-50 shadow-[inset_0_0_0_2px_rgb(129,140,248)]'
+                        : 'bg-white shadow-[inset_0_0_0_1px_rgb(226,232,240)]'
+                    }`}
+                  >
+                    <span className="text-2xl">{EMOTION_MAP[displayEmotion].emoji}</span>
+                    <span className="text-xs text-slate-500 mt-1">
+                      {format(new Date(entry.createdAt), 'HH:mm')}
+                    </span>
+                    {entry.isCorrected && (
+                      <span className="absolute top-1 right-1 w-2 h-2 bg-indigo-500 rounded-full" />
+                    )}
+                  </button>
+                );
+              })}
             </div>
 
             {/* Selected entry or all entries */}
             {selectedEntry ? (
-              <EntryCard entry={selectedEntry} onClose={() => setSelectedEntry(null)} />
+              <EntryCard
+                entry={selectedEntry}
+                onClose={() => setSelectedEntry(null)}
+                onEmotionCorrect={handleEmotionCorrect}
+              />
             ) : (
               entries.map((entry) => (
                 <div key={entry.id} onClick={() => setSelectedEntry(entry)} className="cursor-pointer">

@@ -114,9 +114,14 @@ interface DiaryEntry {
   date: string;           // YYYY-MM-DD (하루에 여러 개 가능)
   createdAt: string;      // ISO timestamp
   transcript: string;     // 음성 텍스트
-  keywords: string[];     // AI 추출 키워드 (최소 3개)
-  emotion: Emotion;       // AI 분석 감정
+  keywords: string[];     // AI 추출 해시태그 (3-6개, 감정 제외)
+  emotion: Emotion;       // AI 분석 감정 (원본)
   summary?: string;       // AI 한줄 요약
+
+  // B 준비용 교정 필드
+  isCorrected?: boolean;       // 사용자가 감정을 교정했는지
+  correctedEmotion?: Emotion;  // 교정된 감정 (원본 유지)
+  correctedAt?: string;        // 교정 시각
 }
 ```
 
@@ -209,8 +214,10 @@ interface DiaryEntry {
 
 ### 해시태그 추출 (hashtag-rules.md)
 - 감정과 독립적으로 추출 (감정이 슬픔이어도 #떡볶이 가능)
+- **감정 단어 제외**: 행복, 슬픔, 불안 등은 키워드에 포함 안 함
 - 구체적 명사 우선: 고유명사 > 행위 > 사물 > 맥락
-- 3~5개, 14자 이내, 소문자
+- 3-6개, 14자 이내, 언어 통일
+- 해시태그 엔진: `lib/hashtags.ts` (정규화 사전, 블랙리스트)
 
 ## 참고 문서
 

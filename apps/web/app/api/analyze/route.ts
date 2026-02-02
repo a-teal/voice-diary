@@ -4,6 +4,22 @@ import { AnalysisResult } from '@/types';
 import { checkRateLimit, getClientIdentifier } from '@/lib/rate-limit';
 import { validateTranscript, sanitizeTranscript, normalizeEmotion } from '@/lib/validations';
 import { EMOTION_MAP } from '@/constants/emotions';
+import { detectLanguage, hashtagsToKeywords, extractHashtags } from '@/lib/hashtags';
+
+// 감정 단어 블랙리스트 (키워드에서 제외)
+const EMOTION_BLACKLIST = new Set([
+  // 한국어
+  '행복', '기쁨', '즐거움', '슬픔', '우울', '불안', '걱정', '화남',
+  '짜증', '분노', '피곤', '지침', '설렘', '뿌듯', '감사', '평온',
+  '무난', '놀람', '충격', '기대', '두려움', '긴장', '외로움',
+  // 영어
+  'happy', 'sad', 'angry', 'anxious', 'worried', 'tired', 'exhausted',
+  'excited', 'nervous', 'stressed', 'frustrated', 'depressed', 'upset',
+  'grateful', 'thankful', 'peaceful', 'calm', 'surprised', 'shocked',
+  // 일반어 (과잉 일반적)
+  '하루', '일상', '기록', '생각', '느낌', '오늘', '내일', '어제',
+  'today', 'daily', 'life', 'thoughts', 'feeling', 'day',
+]);
 
 export async function POST(request: NextRequest) {
   try {
@@ -158,26 +174,32 @@ export async function POST(request: NextRequest) {
       };
     }
 
-    // Validate and sanitize result - ensure at least 3 keywords
-    const fallbackKeywords = ['일상', '기록', '오늘'];
+    // Validate and sanitize result - ensure 2-6 keywords
+    // Filter out emotion words and generic words
+    const lang = detectLanguage(transcript);
+
     if (!Array.isArray(result.keywords) || result.keywords.length === 0) {
-      result.keywords = fallbackKeywords;
+      // Use hashtag engine as fallback
+      const extracted = extractHashtags(transcript, lang);
+      result.keywords = hashtagsToKeywords(extracted);
     } else {
-      // Limit to 5 keywords, sanitize each
+      // Filter and sanitize AI-provided keywords
       result.keywords = result.keywords
-        .slice(0, 5)
-        .map(k => String(k).slice(0, 20));
-      // Ensure at least 3 keywords
-      while (result.keywords.length < 3) {
-        const fallback = fallbackKeywords[result.keywords.length];
-        if (!result.keywords.includes(fallback)) {
-          result.keywords.push(fallback);
-        } else {
-          result.keywords.push('메모');
+        .map(k => String(k).replace(/^#/, '').trim().slice(0, 20)) // Remove # prefix, limit length
+        .filter(k => k.length > 0 && !EMOTION_BLACKLIST.has(k.toLowerCase()))
+        .slice(0, 6); // Max 6 keywords
+
+      // Ensure minimum 2 keywords
+      if (result.keywords.length < 2) {
+        const extracted = extractHashtags(transcript, lang);
+        const extraKeywords = hashtagsToKeywords(extracted)
+          .filter(k => !result.keywords.includes(k));
+        while (result.keywords.length < 2 && extraKeywords.length > 0) {
+          result.keywords.push(extraKeywords.shift()!);
         }
       }
     }
-    console.log('Final keywords:', result.keywords);
+    console.log('[ANALYZE] Final keywords:', result.keywords);
 
     // Summary 검증
     if (!result.summary || typeof result.summary !== 'string') {

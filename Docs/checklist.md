@@ -32,6 +32,8 @@
 - [x] 프롬프트 파일 로드 (fs.readFileSync)
 - [x] 규칙 파일 통합 (rules/emotion-rules.md, rules/hashtag-rules.md)
 - [x] 해시태그 추출 개선 (감정 독립, 명사 위주)
+- [x] 해시태그 엔진 구현 (정규화 사전, 블랙리스트, 3-6개)
+- [x] 감정 단어 블랙리스트 필터링
 - [x] 모델 업데이트 (claude-3-haiku-20240307)
 - [x] Zod 설치
 
@@ -45,10 +47,12 @@
 - [x] 감정 아이콘 클릭 시 상세 보기
 - [x] 일기 카드 클릭 시 전체 텍스트 보기
 - [x] 해시태그 클릭 시 통계 검색 연동
+- [x] 감정 수정 기능 (이모지 클릭 → 10개 선택)
 
 ### 1.5 로컬 저장
 - [x] localStorage CRUD
 - [x] 데이터 스키마 정의
+- [x] 감정 교정 필드 추가 (isCorrected, correctedEmotion, correctedAt)
 
 ### 1.6 테스트 & 배포
 - [x] 단위 테스트 작성 (22개)
