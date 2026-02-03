@@ -1,0 +1,52 @@
+{
+  "common": {
+    "appName": "Voice Diary",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "confirm": "Confirm"
+  },
+  "nav": {
+    "home": "Home",
+    "calendar": "Calendar",
+    "stats": "Stats"
+  },
+  "home": {
+    "title": "Today's Diary",
+    "empty": "No entries yet",
+    "startRecording": "Start Recording"
+  },
+  "recording": {
+    "listening": "Listening...",
+    "tapToStop": "Tap to stop",
+    "analyzing": "Analyzing..."
+  },
+  "emotion": {
+    "happy": "Happy",
+    "excited": "Excited",
+    "proud": "Proud",
+    "peaceful": "Peaceful",
+    "neutral": "Neutral",
+    "sad": "Sad",
+    "angry": "Angry",
+    "anxious": "Anxious",
+    "exhausted": "Exhausted",
+    "surprised": "Surprised"
+  },
+  "calendar": {
+    "title": "Calendar",
+    "today": "Today"
+  },
+  "stats": {
+    "title": "Stats",
+    "emotionTrend": "Emotion Trend",
+    "topKeywords": "Top Keywords",
+    "totalEntries": "Total Entries"
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "languageDescription": "Choose your preferred language"
+  }
+}

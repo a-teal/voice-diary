@@ -1,0 +1,52 @@
+{
+  "common": {
+    "appName": "보이스 다이어리",
+    "save": "저장",
+    "cancel": "취소",
+    "delete": "삭제",
+    "edit": "수정",
+    "confirm": "확인"
+  },
+  "nav": {
+    "home": "홈",
+    "calendar": "캘린더",
+    "stats": "통계"
+  },
+  "home": {
+    "title": "오늘의 일기",
+    "empty": "아직 기록이 없어요",
+    "startRecording": "녹음 시작"
+  },
+  "recording": {
+    "listening": "듣고 있어요...",
+    "tapToStop": "탭하면 멈춤",
+    "analyzing": "분석 중..."
+  },
+  "emotion": {
+    "happy": "기쁨",
+    "excited": "설렘",
+    "proud": "뿌듯",
+    "peaceful": "평온",
+    "neutral": "무난",
+    "sad": "슬픔",
+    "angry": "분노",
+    "anxious": "불안",
+    "exhausted": "지침",
+    "surprised": "놀람"
+  },
+  "calendar": {
+    "title": "캘린더",
+    "today": "오늘"
+  },
+  "stats": {
+    "title": "통계",
+    "emotionTrend": "감정 추이",
+    "topKeywords": "자주 쓴 키워드",
+    "totalEntries": "총 기록"
+  },
+  "settings": {
+    "title": "설정",
+    "language": "언어",
+    "languageDescription": "사용할 언어를 선택하세요"
+  }
+}
