@@ -39,7 +39,7 @@ ANTHROPIC_API_KEY=sk-ant-xxxxx
 
 ## 배포
 
-- **Web**: https://voice-diary-eta.vercel.app
+- **Web**: https://web-zeta-five-44.vercel.app
 - **GitHub**: https://github.com/a-teal/voice-diary
 
 ## 기술 스택

@@ -137,7 +137,7 @@ interface DiaryEntry {
 ## 배포
 
 - **GitHub**: https://github.com/a-teal/voice-diary
-- **Vercel (Web)**: https://voice-diary-eta.vercel.app
+- **Vercel (Web)**: https://web-zeta-five-44.vercel.app
 
 ## 디자인 시스템
 

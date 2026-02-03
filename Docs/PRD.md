@@ -25,7 +25,7 @@
 
 | 플랫폼 | 상태 | URL |
 |--------|------|-----|
-| Web | ✅ 운영 중 | https://voice-diary-eta.vercel.app |
+| Web | ✅ 운영 중 | https://web-zeta-five-44.vercel.app |
 | GitHub | ✅ 운영 중 | https://github.com/a-teal/voice-diary |
 | iOS | 🔄 개발 중 | Xcode 프로젝트 생성됨 |
 | Android | 🔄 개발 중 | Android Studio 프로젝트 생성됨 |

@@ -182,7 +182,7 @@
 
 | 플랫폼 | 상태 | URL |
 |--------|------|-----|
-| Web | ✅ 완료 | https://voice-diary-eta.vercel.app |
+| Web | ✅ 완료 | https://web-zeta-five-44.vercel.app |
 | GitHub | ✅ 완료 | https://github.com/a-teal/voice-diary |
 | iOS | 🔄 테스트 중 | Xcode 프로젝트 + Speech Recognition |
 | Android | 🔄 설정 완료 | Android Studio 프로젝트 생성됨 |
