@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Square, X, Loader2, Check } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useVoiceRecorder } from '@/hooks/useVoiceRecorder';
 import { AnalysisResult, DiaryEntry } from '@/types';
 import { saveEntry, generateId } from '@/lib/storage';
@@ -17,6 +18,7 @@ interface RecordingModalProps {
 type RecordingState = 'idle' | 'recording' | 'analyzing' | 'done';
 
 export default function RecordingModal({ isOpen, onClose, onSaved }: RecordingModalProps) {
+  const { t } = useTranslation();
   const {
     status,
     transcript,
@@ -185,7 +187,7 @@ export default function RecordingModal({ isOpen, onClose, onSaved }: RecordingMo
               <div className="flex-1 flex flex-col items-center justify-center text-center">
                 <p className="text-red-500">{error}</p>
                 <p className="text-slate-500 text-sm mt-2">
-                  Chrome, Safari, Edge 브라우저를 사용해주세요
+                  {t('recording.browserNotSupported')}
                 </p>
               </div>
             )}
@@ -213,7 +215,7 @@ export default function RecordingModal({ isOpen, onClose, onSaved }: RecordingMo
                       <Textarea
                         liveText={transcript}
                         liveMergeMode="replace"
-                        placeholder="천천히 말해도 돼요..."
+                        placeholder={t('recording.placeholder')}
                         className="h-full min-h-[200px] bg-slate-50 border-0 focus:ring-0"
                         readOnly
                       />
@@ -225,7 +227,7 @@ export default function RecordingModal({ isOpen, onClose, onSaved }: RecordingMo
                       className="mt-6 w-full bg-slate-900 text-white py-4 rounded-xl font-semibold shadow-lg hover:bg-black active:scale-95 transition-all flex items-center justify-center gap-2"
                     >
                       <Square className="w-5 h-5 fill-current" />
-                      여기까지 할게요
+                      {t('recording.tapToStop')}
                     </button>
                   </div>
                 )}
@@ -235,7 +237,7 @@ export default function RecordingModal({ isOpen, onClose, onSaved }: RecordingMo
                   <div className="flex-1 flex flex-col items-center justify-center space-y-4">
                     <Loader2 className="w-12 h-12 text-indigo-600 animate-spin" />
                     <p className="text-indigo-600 font-medium animate-pulse">
-                      정리하고 있어요...
+                      {t('recording.analyzing')}
                     </p>
                   </div>
                 )}
@@ -252,9 +254,9 @@ export default function RecordingModal({ isOpen, onClose, onSaved }: RecordingMo
                         <Check className="w-8 h-8 text-green-600" />
                       </motion.div>
                       <div className="text-center">
-                        <h4 className="text-xl font-bold text-slate-800">잘 남겨뒀어요!</h4>
+                        <h4 className="text-xl font-bold text-slate-800">{t('recording.done')}</h4>
                         <p className="text-slate-500 text-sm mt-1">
-                          {formatDuration(recordingTime)} 동안 이야기했어요
+                          {t('recording.durationMsg', { duration: formatDuration(recordingTime) })}
                         </p>
                       </div>
                     </div>
@@ -262,7 +264,7 @@ export default function RecordingModal({ isOpen, onClose, onSaved }: RecordingMo
                       onClick={handleSave}
                       className="w-full bg-indigo-600 text-white py-4 rounded-xl font-semibold shadow-lg shadow-indigo-200 hover:bg-indigo-700 active:scale-95 transition-all"
                     >
-                      저장하기
+                      {t('common.save')}
                     </button>
                   </div>
                 )}
@@ -271,7 +273,7 @@ export default function RecordingModal({ isOpen, onClose, onSaved }: RecordingMo
                 {state === 'idle' && (
                   <div className="flex-1 flex flex-col items-center justify-center">
                     <Loader2 className="w-8 h-8 text-indigo-600 animate-spin" />
-                    <p className="text-slate-500 mt-2">준비 중...</p>
+                    <p className="text-slate-500 mt-2">{t('recording.preparing')}</p>
                   </div>
                 )}
               </div>

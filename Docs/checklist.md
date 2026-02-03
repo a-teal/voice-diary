@@ -145,15 +145,15 @@
 - [x] react-i18next 설치 및 설정
 - [x] 번역 파일 구조 (ko.json, en.json)
 - [x] 언어 감지 로직 (브라우저 → localStorage)
-- [ ] useTranslation 훅 적용
+- [x] useTranslation 훅 적용
 
 ### 4.2 UI 번역
-- [ ] 하드코딩 텍스트 추출 → 번역 키 전환
-- [ ] 한국어/영어 번역 완료
-- [ ] 설정 페이지 + 언어 선택 UI
+- [x] 하드코딩 텍스트 추출 → 번역 키 전환
+- [x] 한국어/영어 번역 완료
+- [x] 설정 페이지 + 언어 선택 UI (system/ko/en 옵션)
 
 ### 4.3 AI/STT 연동
-- [ ] STT 언어 매핑 (ko→ko-KR, en→en-US)
+- [x] STT 언어 매핑 (ko→ko-KR, en→en-US)
 - [ ] AI 분석: 입력 언어로 응답
 - [ ] 모바일 테스트 (Capacitor)
 

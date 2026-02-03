@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
+import { useTranslation } from 'react-i18next';
 import Header from '@/components/layout/Header';
 import BottomNav from '@/components/layout/BottomNav';
 import EntryCard from '@/components/diary/EntryCard';
@@ -14,6 +15,7 @@ import { EMOTION_MAP } from '@/lib/emotion';
 import { format } from 'date-fns';
 
 export default function Home() {
+  const { t } = useTranslation();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [entries, setEntries] = useState<DiaryEntry[]>([]);
   const [isRecordingOpen, setIsRecordingOpen] = useState(false);
@@ -207,12 +209,10 @@ export default function Home() {
             </div>
             <div>
               <h3 className="text-xl font-bold text-slate-800">
-                {isToday ? '지금 생각나는 거 있어요?' : '이 날의 기록이 없어요'}
+                {isToday ? t('home.emptyToday') : t('home.emptyPast')}
               </h3>
               <p className="text-slate-500 text-sm mt-2 max-w-[200px] mx-auto">
-                {isToday
-                  ? '말만 해요, 남겨줄게요'
-                  : '아직 기록이 없는 날이에요'}
+                {isToday ? t('home.emptyTodayDesc') : t('home.emptyPastDesc')}
               </p>
             </div>
           </div>
@@ -226,9 +226,9 @@ export default function Home() {
           whileTap={{ scale: 0.95 }}
           onClick={() => setIsRecordingOpen(true)}
           className="fixed bottom-24 left-1/2 -translate-x-1/2 w-20 h-20 bg-white rounded-full shadow-xl shadow-slate-200 border border-slate-100 flex items-center justify-center z-20"
-          aria-label="녹음 시작"
+          aria-label={t('home.startRecording')}
         >
-          <Image src="/icons/Icon.png" alt="녹음" width={48} height={48} />
+          <Image src="/icons/Icon.png" alt={t('home.startRecording')} width={48} height={48} />
         </motion.button>
       )}
 

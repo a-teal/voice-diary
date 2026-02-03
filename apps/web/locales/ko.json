@@ -1,26 +1,36 @@
 {
   "common": {
     "appName": "보이스 다이어리",
-    "save": "저장",
+    "save": "저장하기",
     "cancel": "취소",
     "delete": "삭제",
     "edit": "수정",
-    "confirm": "확인"
+    "confirm": "확인",
+    "loading": "로딩 중..."
   },
   "nav": {
     "home": "홈",
     "calendar": "캘린더",
-    "stats": "통계"
+    "stats": "통계",
+    "settings": "설정"
   },
   "home": {
     "title": "오늘의 일기",
-    "empty": "아직 기록이 없어요",
+    "emptyToday": "지금 생각나는 거 있어요?",
+    "emptyTodayDesc": "말만 해요, 남겨줄게요",
+    "emptyPast": "이 날의 기록이 없어요",
+    "emptyPastDesc": "아직 기록이 없는 날이에요",
     "startRecording": "녹음 시작"
   },
   "recording": {
     "listening": "듣고 있어요...",
-    "tapToStop": "탭하면 멈춤",
-    "analyzing": "분석 중..."
+    "tapToStop": "여기까지 할게요",
+    "analyzing": "정리하고 있어요...",
+    "done": "잘 남겨뒀어요!",
+    "durationMsg": "{{duration}} 동안 이야기했어요",
+    "placeholder": "천천히 말해도 돼요...",
+    "preparing": "준비 중...",
+    "browserNotSupported": "Chrome, Safari, Edge 브라우저를 사용해주세요"
   },
   "emotion": {
     "happy": "기쁨",
@@ -36,17 +46,39 @@
   },
   "calendar": {
     "title": "캘린더",
-    "today": "오늘"
+    "today": "오늘",
+    "monthSummary": "이번 달 요약",
+    "entries": "기록"
   },
   "stats": {
-    "title": "통계",
-    "emotionTrend": "감정 추이",
+    "title": "감정 분석",
+    "emotionTrend": "감정 흐름",
     "topKeywords": "자주 쓴 키워드",
-    "totalEntries": "총 기록"
+    "totalEntries": "기록 수",
+    "mainEmotion": "주요 감정",
+    "emotionDistribution": "감정 분포",
+    "last7days": "최근 7일",
+    "last30days": "최근 30일",
+    "searchPlaceholder": "키워드 검색...",
+    "clearFilters": "필터 초기화",
+    "noData": "데이터가 없어요",
+    "noKeywords": "키워드가 없어요",
+    "emptyTitle": "아직 기록이 없어요",
+    "emptyDesc": "조금 더 남기면 패턴이 보여요",
+    "times": "{{count}}회"
   },
   "settings": {
     "title": "설정",
     "language": "언어",
-    "languageDescription": "사용할 언어를 선택하세요"
+    "languageDescription": "앱에서 사용할 언어를 선택하세요",
+    "currentLanguage": "현재 적용 언어",
+    "systemOption": "시스템 설정",
+    "korean": "한국어",
+    "english": "English"
+  },
+  "date": {
+    "format": "yyyy년 M월 d일",
+    "monthFormat": "yyyy년 M월",
+    "weekdays": ["일", "월", "화", "수", "목", "금", "토"]
   }
 }

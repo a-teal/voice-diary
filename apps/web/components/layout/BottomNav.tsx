@@ -2,20 +2,23 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Calendar, BarChart2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { Home, Calendar, BarChart2, Settings } from 'lucide-react';
 
 const navItems = [
-  { href: '/', label: 'Home', Icon: Home },
-  { href: '/calendar', label: 'Calendar', Icon: Calendar },
-  { href: '/stats', label: 'Stats', Icon: BarChart2 },
+  { href: '/', labelKey: 'nav.home', Icon: Home },
+  { href: '/calendar', labelKey: 'nav.calendar', Icon: Calendar },
+  { href: '/stats', labelKey: 'nav.stats', Icon: BarChart2 },
+  { href: '/settings', labelKey: 'nav.settings', Icon: Settings },
 ];
 
 export default function BottomNav() {
   const pathname = usePathname();
+  const { t } = useTranslation();
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 h-16 bg-white border-t border-slate-200 flex items-center justify-around px-4 z-50 safe-bottom">
-      {navItems.map(({ href, label, Icon }) => {
+      {navItems.map(({ href, labelKey, Icon }) => {
         const isActive = pathname === href;
         return (
           <Link
@@ -26,7 +29,7 @@ export default function BottomNav() {
             }`}
           >
             <Icon className="w-6 h-6" strokeWidth={isActive ? 2.5 : 2} />
-            <span className="text-[10px] font-medium">{label}</span>
+            <span className="text-[10px] font-medium">{t(labelKey)}</span>
           </Link>
         );
       })}

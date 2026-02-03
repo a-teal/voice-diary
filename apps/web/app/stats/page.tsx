@@ -5,12 +5,14 @@ import { useSearchParams } from 'next/navigation';
 import { subDays, isAfter, format } from 'date-fns';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { Search, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import BottomNav from '@/components/layout/BottomNav';
 import { DiaryEntry, Emotion } from '@/types';
 import { getAllEntries } from '@/lib/storage';
 import { EMOTION_MAP, MOOD_VALUES, EMOTIONS } from '@/lib/emotion';
 
 function StatsContent() {
+  const { t, i18n } = useTranslation();
   const searchParams = useSearchParams();
   const [entries, setEntries] = useState<DiaryEntry[]>([]);
   const [period, setPeriod] = useState<7 | 30>(7);
@@ -99,23 +101,30 @@ function StatsContent() {
   return (
     <div className="flex flex-col min-h-screen bg-slate-50 overflow-y-auto">
       <header className="px-6 pt-12 pb-4 bg-white shadow-sm">
-        <h2 className="text-2xl font-bold text-slate-900 mb-4">감정 분석</h2>
+        <h2 className="text-2xl font-bold text-slate-900 mb-4">{t('stats.title')}</h2>
 
         {/* Period toggle */}
         <div className="flex bg-slate-100 p-1 rounded-xl w-full mb-4">
-          {[7, 30].map((p) => (
-            <button
-              key={p}
-              onClick={() => setPeriod(p as 7 | 30)}
-              className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
-                period === p
-                  ? 'bg-white text-indigo-600 shadow-sm'
-                  : 'text-slate-400 hover:text-slate-600'
-              }`}
-            >
-              최근 {p}일
-            </button>
-          ))}
+          <button
+            onClick={() => setPeriod(7)}
+            className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
+              period === 7
+                ? 'bg-white text-indigo-600 shadow-sm'
+                : 'text-slate-400 hover:text-slate-600'
+            }`}
+          >
+            {t('stats.last7days')}
+          </button>
+          <button
+            onClick={() => setPeriod(30)}
+            className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
+              period === 30
+                ? 'bg-white text-indigo-600 shadow-sm'
+                : 'text-slate-400 hover:text-slate-600'
+            }`}
+          >
+            {t('stats.last30days')}
+          </button>
         </div>
 
         {/* Search */}
@@ -123,7 +132,7 @@ function StatsContent() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <input
             type="text"
-            placeholder="키워드 검색..."
+            placeholder={t('stats.searchPlaceholder')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-10 pr-4 py-2.5 bg-slate-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -149,7 +158,7 @@ function StatsContent() {
                   ? 'bg-indigo-100 ring-2 ring-indigo-500'
                   : 'bg-slate-100 opacity-60 hover:opacity-100'
               }`}
-              title={EMOTION_MAP[emotion].labelKo}
+              title={t(`emotion.${emotion}`)}
             >
               {EMOTION_MAP[emotion].emoji}
             </button>
@@ -161,7 +170,7 @@ function StatsContent() {
             onClick={clearFilters}
             className="mt-2 text-sm text-indigo-600 hover:underline"
           >
-            필터 초기화
+            {t('stats.clearFilters')}
           </button>
         )}
       </header>
@@ -170,9 +179,9 @@ function StatsContent() {
         {entries.length === 0 ? (
           <div className="text-center py-20">
             <p className="text-6xl mb-4">📊</p>
-            <p className="text-slate-500">아직 기록이 없어요</p>
+            <p className="text-slate-500">{t('stats.emptyTitle')}</p>
             <p className="text-slate-400 text-sm mt-2">
-              조금 더 남기면 패턴이 보여요
+              {t('stats.emptyDesc')}
             </p>
           </div>
         ) : (
@@ -180,15 +189,15 @@ function StatsContent() {
             {/* Summary Cards */}
             <section className="grid grid-cols-2 gap-4">
               <div className="bg-white p-5 rounded-3xl shadow-sm border border-slate-100">
-                <h4 className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">기록 수</h4>
+                <h4 className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">{t('stats.totalEntries')}</h4>
                 <p className="text-3xl font-bold text-slate-900">{filteredEntries.length}</p>
               </div>
               <div className="bg-white p-5 rounded-3xl shadow-sm border border-slate-100">
-                <h4 className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">주요 감정</h4>
+                <h4 className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">{t('stats.mainEmotion')}</h4>
                 {mostFrequentMood ? (
                   <div className="flex items-center gap-2">
                     <span className="text-2xl">{mostFrequentMood.emoji}</span>
-                    <span className="font-semibold text-slate-700">{mostFrequentMood.labelKo}</span>
+                    <span className="font-semibold text-slate-700">{t(`emotion.${Object.entries(EMOTION_MAP).find(([_, v]) => v.emoji === mostFrequentMood.emoji)?.[0]}`)}</span>
                   </div>
                 ) : (
                   <span className="text-slate-300">-</span>
@@ -198,7 +207,7 @@ function StatsContent() {
 
             {/* Mood Flow Chart */}
             <section className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
-              <h3 className="font-bold text-slate-800 mb-6">감정 흐름</h3>
+              <h3 className="font-bold text-slate-800 mb-6">{t('stats.emotionTrend')}</h3>
               <div className="h-48 w-full">
                 {chartData.length > 0 ? (
                   <ResponsiveContainer width="100%" height="100%">
@@ -231,7 +240,7 @@ function StatsContent() {
                   </ResponsiveContainer>
                 ) : (
                   <div className="h-full flex items-center justify-center text-slate-400 text-sm">
-                    데이터가 없어요
+                    {t('stats.noData')}
                   </div>
                 )}
               </div>
@@ -240,15 +249,15 @@ function StatsContent() {
             {/* Emotion Distribution */}
             {emotionDistribution.length > 0 && (
               <section className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
-                <h3 className="font-bold text-slate-800 mb-4">감정 분포</h3>
+                <h3 className="font-bold text-slate-800 mb-4">{t('stats.emotionDistribution')}</h3>
                 <div className="space-y-3">
                   {emotionDistribution.map((item) => (
                     <div key={item.emotion} className="flex items-center gap-3">
                       <span className="text-xl w-8">{item.emoji}</span>
                       <div className="flex-1">
                         <div className="flex justify-between mb-1">
-                          <span className="text-sm text-slate-600">{item.labelKo}</span>
-                          <span className="text-sm text-slate-400">{item.count}회</span>
+                          <span className="text-sm text-slate-600">{t(`emotion.${item.emotion}`)}</span>
+                          <span className="text-sm text-slate-400">{t('stats.times', { count: item.count })}</span>
                         </div>
                         <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
                           <div
@@ -268,7 +277,7 @@ function StatsContent() {
 
             {/* Keyword Cloud */}
             <section>
-              <h3 className="font-bold text-slate-800 mb-4">자주 쓴 키워드</h3>
+              <h3 className="font-bold text-slate-800 mb-4">{t('stats.topKeywords')}</h3>
               <div className="flex flex-wrap gap-2">
                 {keywordCounts.length > 0 ? (
                   keywordCounts.slice(0, 15).map(([word, count], i) => (
@@ -287,7 +296,7 @@ function StatsContent() {
                     </button>
                   ))
                 ) : (
-                  <p className="text-slate-400 text-sm italic">키워드가 없어요</p>
+                  <p className="text-slate-400 text-sm italic">{t('stats.noKeywords')}</p>
                 )}
               </div>
             </section>

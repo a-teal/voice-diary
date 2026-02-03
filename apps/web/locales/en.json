@@ -5,22 +5,32 @@
     "cancel": "Cancel",
     "delete": "Delete",
     "edit": "Edit",
-    "confirm": "Confirm"
+    "confirm": "Confirm",
+    "loading": "Loading..."
   },
   "nav": {
     "home": "Home",
     "calendar": "Calendar",
-    "stats": "Stats"
+    "stats": "Stats",
+    "settings": "Settings"
   },
   "home": {
     "title": "Today's Diary",
-    "empty": "No entries yet",
+    "emptyToday": "Anything on your mind?",
+    "emptyTodayDesc": "Just speak, I'll keep it",
+    "emptyPast": "No entries for this day",
+    "emptyPastDesc": "Nothing recorded yet",
     "startRecording": "Start Recording"
   },
   "recording": {
     "listening": "Listening...",
-    "tapToStop": "Tap to stop",
-    "analyzing": "Analyzing..."
+    "tapToStop": "That's all",
+    "analyzing": "Processing...",
+    "done": "Got it!",
+    "durationMsg": "Talked for {{duration}}",
+    "placeholder": "Take your time...",
+    "preparing": "Preparing...",
+    "browserNotSupported": "Please use Chrome, Safari, or Edge"
   },
   "emotion": {
     "happy": "Happy",
@@ -36,17 +46,39 @@
   },
   "calendar": {
     "title": "Calendar",
-    "today": "Today"
+    "today": "Today",
+    "monthSummary": "Monthly Summary",
+    "entries": "Entries"
   },
   "stats": {
-    "title": "Stats",
-    "emotionTrend": "Emotion Trend",
+    "title": "Emotion Analysis",
+    "emotionTrend": "Mood Flow",
     "topKeywords": "Top Keywords",
-    "totalEntries": "Total Entries"
+    "totalEntries": "Total Entries",
+    "mainEmotion": "Main Emotion",
+    "emotionDistribution": "Emotion Distribution",
+    "last7days": "Last 7 days",
+    "last30days": "Last 30 days",
+    "searchPlaceholder": "Search keywords...",
+    "clearFilters": "Clear filters",
+    "noData": "No data",
+    "noKeywords": "No keywords",
+    "emptyTitle": "No entries yet",
+    "emptyDesc": "Record more to see patterns",
+    "times": "{{count}}x"
   },
   "settings": {
     "title": "Settings",
     "language": "Language",
-    "languageDescription": "Choose your preferred language"
+    "languageDescription": "Choose your preferred language",
+    "currentLanguage": "Current language",
+    "systemOption": "System default",
+    "korean": "한국어",
+    "english": "English"
+  },
+  "date": {
+    "format": "MMM d, yyyy",
+    "monthFormat": "MMMM yyyy",
+    "weekdays": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
   }
 }
