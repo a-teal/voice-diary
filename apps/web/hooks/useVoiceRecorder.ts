@@ -142,39 +142,18 @@ export function useVoiceRecorder(): UseVoiceRecorderReturn {
               finalTranscriptRef.current = finalTranscript;
               console.log('[STT] New segment started:', trimmedText);
             } else if (trimmedText.startsWith(currentSegment)) {
-              // Simple extension of current segment
+              // Simple extension of current segment (누적 결과)
               finalTranscript = base + trimmedText + ' ';
               finalTranscriptRef.current = finalTranscript;
               console.log('[STT] Extended segment to:', trimmedText);
+            } else if (currentSegment.startsWith(trimmedText)) {
+              // 새 텍스트가 현재 세그먼트의 일부 - 무시 (이미 더 긴 버전 있음)
+              console.log('[STT] Skipping shorter version:', trimmedText);
             } else {
-              // Android sends cumulative results with possible corrections
-              // Compare by words within current segment only
-              const currentWords = currentSegment.split(/\s+/);
-              const newWords = trimmedText.split(/\s+/);
-
-              // Find common prefix length (words matching from start)
-              let commonPrefix = 0;
-              const minLen = Math.min(currentWords.length, newWords.length);
-              for (let j = 0; j < minLen; j++) {
-                if (currentWords[j] === newWords[j]) {
-                  commonPrefix++;
-                } else {
-                  break;
-                }
-              }
-
-              // If at least 1 word matches at start, treat as cumulative/correction within segment
-              if (commonPrefix >= 1) {
-                // Use the newer version (likely longer or corrected)
-                finalTranscript = base + trimmedText + ' ';
-                finalTranscriptRef.current = finalTranscript;
-                console.log('[STT] Corrected segment to:', trimmedText, `(${commonPrefix}/${minLen} words matched)`);
-              } else if (!currentSegment.includes(trimmedText)) {
-                // Completely different - skip (shouldn't happen within same segment)
-                console.log('[STT] Skipping unrelated within segment:', trimmedText);
-              } else {
-                console.log('[STT] Skipping contained:', trimmedText);
-              }
+              // 완전히 새로운 텍스트 - 항상 추가 (삭제하지 않음)
+              finalTranscript = base + currentSegment + ' ' + trimmedText + ' ';
+              finalTranscriptRef.current = finalTranscript;
+              console.log('[STT] Appended new text:', trimmedText);
             }
           }
           // 처리 완료된 결과 인덱스 업데이트
