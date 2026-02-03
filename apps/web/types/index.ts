@@ -15,6 +15,12 @@ export type Emotion =
   // 기타
   | 'surprised'; // 😲 놀람
 
+// 감정 가중치 (확신도)
+export interface EmotionWeight {
+  emotion: Emotion;
+  weight: number;  // 0.0 ~ 1.0 (가중치/확신도)
+}
+
 // 일기 엔트리
 export interface DiaryEntry {
   id: string;
@@ -24,8 +30,13 @@ export interface DiaryEntry {
   transcript: string;     // 음성 → 텍스트
 
   keywords: string[];     // AI 추출 해시태그 (3-6개)
-  emotion: Emotion;       // AI 분석 감정 (원본)
+  emotion: Emotion;       // 대표 감정 (UI 표시용, primaryEmotion과 동일)
   summary?: string;       // AI 한줄 요약
+
+  // 복수 감정 시스템
+  primaryEmotion: Emotion;              // 대표 감정 (UI 표시)
+  secondaryEmotions?: Emotion[];        // 부가 감정 (최대 2개, 내부 분석용)
+  emotionWeights?: EmotionWeight[];     // 감정별 가중치 (내부 학습용)
 
   // B 준비용 교정 필드
   isCorrected?: boolean;         // 사용자가 감정을 교정했는지
@@ -39,8 +50,12 @@ export interface DiaryEntry {
 // AI 분석 응답
 export interface AnalysisResult {
   keywords: string[];
-  emotion: Emotion;
+  emotion: Emotion;              // 하위 호환용 (= primaryEmotion)
   summary: string;
+  // 복수 감정
+  primaryEmotion: Emotion;
+  secondaryEmotions?: Emotion[];
+  emotionWeights?: EmotionWeight[];
 }
 
 // 녹음 상태

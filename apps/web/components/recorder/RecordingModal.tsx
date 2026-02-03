@@ -115,6 +115,8 @@ export default function RecordingModal({ isOpen, onClose, onSaved }: RecordingMo
       setAnalysisResult({
         keywords: [],
         emotion: 'neutral',
+        primaryEmotion: 'neutral',
+        emotionWeights: [{ emotion: 'neutral', weight: 1.0 }],
         summary: transcript.slice(0, 50),
       });
       setState('done');
@@ -128,13 +130,19 @@ export default function RecordingModal({ isOpen, onClose, onSaved }: RecordingMo
     // Use local timezone for date (YYYY-MM-DD)
     const localDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 
+    // primaryEmotion 사용 (하위 호환: emotion 필드도 동일 값)
+    const primaryEmotion = analysisResult.primaryEmotion || analysisResult.emotion;
+
     const entry: DiaryEntry = {
       id: generateId(),
       date: localDate,
       createdAt: now.toISOString(),
       transcript,
       keywords: analysisResult.keywords,
-      emotion: analysisResult.emotion,
+      emotion: primaryEmotion,           // 하위 호환 + UI 표시용
+      primaryEmotion: primaryEmotion,    // 대표 감정
+      secondaryEmotions: analysisResult.secondaryEmotions,  // 부가 감정 (내부용)
+      emotionWeights: analysisResult.emotionWeights,        // 가중치 (학습용)
       summary: analysisResult.summary,
     };
 

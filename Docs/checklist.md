@@ -36,6 +36,7 @@
 - [x] 감정 단어 블랙리스트 필터링
 - [x] 모델 업데이트 (claude-3-haiku-20240307)
 - [x] Zod 설치
+- [x] 복수 감정 시스템 구현 (primaryEmotion, secondaryEmotions, emotionWeights)
 
 ### 1.4 일간 뷰 UI
 - [x] 메인 레이아웃 (헤더, FAB)
