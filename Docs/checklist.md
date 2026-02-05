@@ -36,7 +36,10 @@
 - [x] 감정 단어 블랙리스트 필터링
 - [x] 모델 업데이트 (claude-3-haiku-20240307)
 - [x] Zod 설치
-- [x] 복수 감정 시스템 구현 (primaryEmotion, secondaryEmotions, emotionWeights)
+- [x] 복수 감정 시스템 구현 (primaryEmotionKey, secondaryEmotionKeys)
+- [x] 감정 타입 변경 (proud→grateful 감사, surprised→thoughtful 고민)
+- [x] AI 요약 톤 개선 (관찰자적 위로, 캐주얼 표현 금지)
+- [x] 감정 우선순위 규칙 추가 (exhausted > thoughtful > anxious...)
 
 ### 1.4 일간 뷰 UI
 - [x] 메인 레이아웃 (헤더, FAB)
@@ -54,6 +57,8 @@
 - [x] localStorage CRUD
 - [x] 데이터 스키마 정의
 - [x] 감정 교정 필드 추가 (isCorrected, correctedEmotion, correctedAt)
+- [x] Soft delete 구현 (deletedAt 필드)
+- [x] 보조 감정 표시 (secondaryEmotionKeys 칩)
 
 ### 1.6 테스트 & 배포
 - [x] 단위 테스트 작성 (22개)
@@ -172,7 +177,8 @@
 - [ ] 클라우드 동기화
 
 ### 5.2 추가 기능
-- [ ] 일기 수정/삭제
+- [x] 일기 삭제 (Soft delete 구현 완료)
+- [ ] 일기 수정
 - [ ] 연간 통계
 - [ ] 알림/리마인더
 
@@ -189,7 +195,21 @@
 
 ---
 
+### 5.3 브랜딩
+- [x] 앱 이름 변경 ("말로 쓰는 일기")
+  - layout.tsx (title, appleWebApp)
+  - manifest.json (name, short_name)
+  - capacitor.config.ts (appName)
+  - locales/ko.json, en.json (appName)
+
+---
+
 ## 배포 이슈 해결 기록
+
+### Vercel 모노레포 배포 (2025-02-05)
+- **문제**: Root Directory "apps/web" does not exist
+- **원인**: 변경사항이 GitHub에 푸시되지 않음
+- **해결**: 루트에 vercel.json 추가 + 모든 변경사항 커밋/푸시
 
 ### Vercel 배포 (2025-01-27)
 - **문제 1**: Next.js 16 Turbopack + lightningcss 네이티브 바이너리 호환 문제

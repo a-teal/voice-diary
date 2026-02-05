@@ -104,27 +104,33 @@ ANTHROPIC_API_KEY=sk-ant-xxxxx  # Claude API 키 (필수)
 ## 주요 타입
 
 ```typescript
-// 감정 타입 (10가지: 긍정 4, 중립 1, 부정 4, 기타 1)
+// 감정 타입 (10가지: 긍정 4, 중립 2, 부정 4)
 type Emotion =
-  | 'happy' | 'excited' | 'proud' | 'peaceful'  // 긍정
-  | 'neutral'                                    // 중립
-  | 'sad' | 'angry' | 'anxious' | 'exhausted'   // 부정
-  | 'surprised';                                 // 기타
-// 😊 기쁨 | 🤩 설렘 | 🥰 뿌듯 | 😌 평온 | 😐 무난 | 😢 슬픔 | 😡 분노 | 😰 불안 | 😫 지침 | 😲 놀람
+  | 'happy' | 'grateful' | 'excited' | 'peaceful'  // 긍정
+  | 'neutral' | 'thoughtful'                        // 중립
+  | 'sad' | 'angry' | 'anxious' | 'exhausted';      // 부정
+// 😊 기쁨 | 🥰 감사 | 🤩 설렘 | 😌 평온 | 😐 무난 | 🤔 고민 | 😢 슬픔 | 😡 분노 | 😰 불안 | 😫 지침
 
 interface DiaryEntry {
   id: string;
   date: string;           // YYYY-MM-DD (하루에 여러 개 가능)
   createdAt: string;      // ISO timestamp
   transcript: string;     // 음성 텍스트
-  keywords: string[];     // AI 추출 해시태그 (3-6개, 감정 제외)
-  emotion: Emotion;       // AI 분석 감정 (원본)
-  summary?: string;       // AI 한줄 요약
+  keywords: string[];     // AI 추출 해시태그 (3-5개, 감정 제외)
+  summary?: string;       // AI 한줄 요약 (관찰자적 위로 톤)
 
-  // B 준비용 교정 필드
-  isCorrected?: boolean;       // 사용자가 감정을 교정했는지
-  correctedEmotion?: Emotion;  // 교정된 감정 (원본 유지)
-  correctedAt?: string;        // 교정 시각
+  // 감정 분석 (Primary + Secondary)
+  primaryEmotionKey: Emotion;       // 대표 감정 (필수)
+  secondaryEmotionKeys?: Emotion[]; // 보조 감정 (0-2개)
+  emotion?: Emotion;                // deprecated (하위 호환용)
+
+  // 감정 교정 필드
+  isCorrected?: boolean;
+  correctedEmotion?: Emotion;
+  correctedAt?: string;
+
+  // Soft delete
+  deletedAt?: string;     // 삭제 시각 (있으면 삭제된 항목)
 }
 ```
 
@@ -132,7 +138,7 @@ interface DiaryEntry {
 
 - 테스트 프레임워크: Jest
 - 테스트 파일 위치: `__tests__/`
-- 현재 테스트: 22개 (emotions, validations, rate-limit)
+- 현재 테스트: 37개 (emotions, validations, rate-limit)
 
 ## 배포
 
@@ -211,9 +217,11 @@ interface DiaryEntry {
 규칙 파일은 `rules/` 폴더에 위치하며, `prompts.ts`에서 자동 로드됩니다.
 
 ### 감정 분석 (emotion-rules.md)
-- 10가지 감정 중 하나 선택 (영어 키만 사용)
+- Primary 감정 1개 + Secondary 감정 0-2개
 - neutral은 거의 사용하지 않음 (5가지 조건 모두 충족 시에만)
-- 우선순위: exhausted > anxious > angry > sad > surprised > proud > excited > peaceful > happy > neutral
+- 우선순위: exhausted > thoughtful > anxious > angry > sad > grateful > excited > peaceful > happy > neutral
+- 갈등/선택/결정 언급 시 → thoughtful
+- 피로/지침/컨디션 저하 시 → exhausted
 
 ### 해시태그 추출 (hashtag-rules.md)
 - 감정과 독립적으로 추출 (감정이 슬픔이어도 #떡볶이 가능)

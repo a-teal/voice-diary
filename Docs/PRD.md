@@ -83,15 +83,15 @@
 | 카테고리 | 영어 키 | 이모지 | 한글 | 설명 |
 |----------|---------|--------|------|------|
 | 긍정 | happy | 😊 | 기쁨 | 행복, 즐거움, 만족 |
+| 긍정 | grateful | 🥰 | 감사 | 고마움, 감동 |
 | 긍정 | excited | 🤩 | 설렘 | 기대, 신남 |
-| 긍정 | proud | 🥰 | 뿌듯 | 성취감, 감사 |
 | 긍정 | peaceful | 😌 | 평온 | 차분함, 편안함 |
 | 중립 | neutral | 😐 | 무난 | 특별한 감정 없음 |
+| 중립 | thoughtful | 🤔 | 고민 | 갈등, 선택, 결정 |
 | 부정 | sad | 😢 | 슬픔 | 우울, 외로움, 아쉬움 |
 | 부정 | angry | 😡 | 분노 | 화남, 짜증, 불만 |
 | 부정 | anxious | 😰 | 불안 | 걱정, 초조, 긴장 |
 | 부정 | exhausted | 😫 | 지침 | 피곤, 무기력 |
-| 기타 | surprised | 😲 | 놀람 | 깜짝, 충격 |
 
 ### 4.2 일기 엔트리
 
@@ -102,13 +102,20 @@ interface DiaryEntry {
   createdAt: string;      // ISO timestamp
   transcript: string;     // 음성 → 텍스트
   keywords: string[];     // AI 추출 해시태그 (3-6개, 감정 제외)
-  emotion: Emotion;       // AI 분석 감정 (원본)
   summary?: string;       // AI 한줄 요약
 
-  // 감정 교정 필드 (B 준비용)
-  isCorrected?: boolean;       // 사용자가 감정을 교정했는지
-  correctedEmotion?: Emotion;  // 교정된 감정 (원본 유지)
-  correctedAt?: string;        // 교정 시각
+  // 감정 분석 (Primary + Secondary)
+  primaryEmotionKey: Emotion;       // 대표 감정 (필수)
+  secondaryEmotionKeys?: Emotion[]; // 보조 감정 (선택, 0-2개)
+  emotion?: Emotion;                // deprecated (하위 호환용)
+
+  // 감정 교정 필드
+  isCorrected?: boolean;
+  correctedEmotion?: Emotion;
+  correctedAt?: string;
+
+  // Soft delete
+  deletedAt?: string;     // 삭제 시각 (있으면 삭제된 항목)
 
   editedAt?: string;
   syncedAt?: string;      // 클라우드 동기화 시간
@@ -119,9 +126,10 @@ interface DiaryEntry {
 
 ```typescript
 interface AnalysisResult {
-  keywords: string[];     // 3-6개
-  emotion: Emotion;       // 10가지 중 1개
-  summary: string;        // 한 줄 요약
+  summary: string;                  // 한 줄 요약 (관찰자적 위로 톤)
+  primaryEmotionKey: Emotion;       // 대표 감정 (10가지 중 1개)
+  secondaryEmotionKeys?: Emotion[]; // 보조 감정 (0-2개)
+  keywords: string[];               // 3-5개
 }
 ```
 
