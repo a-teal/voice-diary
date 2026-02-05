@@ -30,7 +30,8 @@
     "durationMsg": "{{duration}} 동안 이야기했어요",
     "placeholder": "천천히 말해도 돼요...",
     "preparing": "준비 중...",
-    "browserNotSupported": "Chrome, Safari, Edge 브라우저를 사용해주세요"
+    "browserNotSupported": "Chrome, Safari, Edge 브라우저를 사용해주세요",
+    "analysisFailed": "분석에 실패했지만 텍스트는 저장되었어요"
   },
   "emotion": {
     "happy": "기쁨",

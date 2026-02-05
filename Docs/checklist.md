@@ -182,6 +182,34 @@
 - [ ] 연간 통계
 - [ ] 알림/리마인더
 
+### 5.4 트래픽 증가 시 업그레이드 (백로그)
+
+> MVP는 Vercel Serverless 기반. 트래픽 증가 시 아래 항목 순차 적용.
+
+- [ ] **Rate Limiting → Vercel KV**
+  - 현재: In-memory Map (Serverless에서 요청마다 리셋됨)
+  - 업그레이드: Vercel KV (Redis) 사용
+  - 적용 시점: DAU 100+ 또는 API 남용 감지 시
+  - 비용: Vercel KV Hobby 무료 (30K 요청/월)
+  ```typescript
+  // apps/web/app/api/analyze/route.ts 수정
+  import { kv } from '@vercel/kv';
+  async function checkRateLimit(clientId: string) {
+    const key = `rate:${clientId}`;
+    const count = await kv.incr(key);
+    if (count === 1) await kv.expire(key, 60);
+    return { allowed: count <= 20, remaining: Math.max(0, 20 - count) };
+  }
+  ```
+
+- [ ] **AI 분석 비용 모니터링**
+  - 현재: Claude Haiku (~$0.00025/요청)
+  - 모니터링: Anthropic Console 사용량 확인
+  - 적용 시점: 월 $10 초과 시 검토
+
+- [ ] **에러 모니터링 (Sentry)**
+  - 적용 시점: 프로덕션 사용자 피드백 필요 시
+
 ---
 
 ## 배포 현황

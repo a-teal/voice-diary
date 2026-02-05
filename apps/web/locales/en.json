@@ -30,7 +30,8 @@
     "durationMsg": "Talked for {{duration}}",
     "placeholder": "Take your time...",
     "preparing": "Preparing...",
-    "browserNotSupported": "Please use Chrome, Safari, or Edge"
+    "browserNotSupported": "Please use Chrome, Safari, or Edge",
+    "analysisFailed": "Analysis failed, but your text was saved"
   },
   "emotion": {
     "happy": "Happy",

@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Square, X, Loader2, Check } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
 import { useVoiceRecorder } from '@/hooks/useVoiceRecorder';
 import { AnalysisResult, DiaryEntry } from '@/types';
 import { saveEntry, generateId } from '@/lib/storage';
@@ -118,6 +119,8 @@ export default function RecordingModal({ isOpen, onClose, onSaved }: RecordingMo
         keywords: [],
       });
       setState('done');
+      // Notify user that analysis failed but text is saved
+      toast.info(t('recording.analysisFailed'));
     }
   };
 

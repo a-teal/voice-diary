@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist } from "next/font/google";
+import { Toaster } from "sonner";
 import "./globals.css";
 import { I18nProvider } from "@/components/providers/I18nProvider";
 
@@ -40,6 +41,7 @@ export default function RootLayout({
     <html lang="ko">
       <body className={`${geistSans.variable} font-sans antialiased`}>
         <I18nProvider>{children}</I18nProvider>
+        <Toaster position="top-center" richColors />
       </body>
     </html>
   );
