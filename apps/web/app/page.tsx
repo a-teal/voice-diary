@@ -9,7 +9,7 @@ import BottomNav from '@/components/layout/BottomNav';
 import EntryCard from '@/components/diary/EntryCard';
 import RecordingModal from '@/components/recorder/RecordingModal';
 import { DiaryEntry, Emotion } from '@/types';
-import { getEntriesByDate, updateEntry } from '@/lib/storage';
+import { getEntriesByDate, updateEntry, deleteEntry } from '@/lib/storage';
 import { useSwipe } from '@/hooks/useSwipe';
 import { EMOTION_MAP } from '@/lib/emotion';
 import { format } from 'date-fns';
@@ -85,6 +85,19 @@ export default function Home() {
     }
   };
 
+  const handleDelete = (entryId: string) => {
+    // Soft delete in storage
+    deleteEntry(entryId);
+
+    // Update local state
+    setEntries(prev => prev.filter(entry => entry.id !== entryId));
+
+    // Clear selected entry if deleted
+    if (selectedEntry?.id === entryId) {
+      setSelectedEntry(null);
+    }
+  };
+
   const isToday = currentDate.toDateString() === new Date().toDateString();
 
   return (
@@ -138,6 +151,7 @@ export default function Home() {
                 entry={selectedEntry}
                 onClose={() => setSelectedEntry(null)}
                 onEmotionCorrect={handleEmotionCorrect}
+                onDelete={handleDelete}
               />
             ) : (
               entries.map((entry) => (
