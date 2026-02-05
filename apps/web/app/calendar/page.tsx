@@ -117,7 +117,7 @@ export default function CalendarPage() {
                 {representativeEntry && (
                   <div className="absolute bottom-0 flex items-center">
                     <span className="text-lg filter drop-shadow-sm transform hover:scale-125 transition-transform">
-                      {EMOTION_MAP[representativeEntry.emotion].emoji}
+                      {EMOTION_MAP[representativeEntry.primaryEmotionKey || representativeEntry.emotion || 'neutral']?.emoji}
                     </span>
                     {entryCount > 1 && (
                       <span className="text-[10px] text-slate-400 ml-0.5">+{entryCount - 1}</span>
@@ -140,7 +140,7 @@ export default function CalendarPage() {
             <div className="flex-1 flex flex-wrap gap-1">
               {entries.map((entry) => (
                 <span key={entry.id} className="text-lg">
-                  {EMOTION_MAP[entry.emotion].emoji}
+                  {EMOTION_MAP[entry.primaryEmotionKey || entry.emotion || 'neutral']?.emoji}
                 </span>
               ))}
             </div>

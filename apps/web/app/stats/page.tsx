@@ -50,19 +50,23 @@ function StatsContent() {
   }, [entries, period, selectedEmotion, searchQuery]);
 
   const chartData = useMemo(() => {
-    return filteredEntries.map(entry => ({
-      date: format(new Date(entry.createdAt), 'MM/dd'),
-      value: MOOD_VALUES[entry.emotion] || 3,
-      emoji: EMOTION_MAP[entry.emotion].emoji,
-      emotion: entry.emotion,
-    }));
+    return filteredEntries.map(entry => {
+      const emotionKey: Emotion = entry.primaryEmotionKey || entry.emotion || 'neutral';
+      return {
+        date: format(new Date(entry.createdAt), 'MM/dd'),
+        value: MOOD_VALUES[emotionKey] || 3,
+        emoji: EMOTION_MAP[emotionKey]?.emoji,
+        emotion: emotionKey,
+      };
+    });
   }, [filteredEntries]);
 
   // Emotion distribution
   const emotionDistribution = useMemo(() => {
     const counts: Record<string, number> = {};
     filteredEntries.forEach(e => {
-      counts[e.emotion] = (counts[e.emotion] || 0) + 1;
+      const emotionKey: Emotion = e.primaryEmotionKey || e.emotion || 'neutral';
+      counts[emotionKey] = (counts[emotionKey] || 0) + 1;
     });
     return EMOTIONS.map(emotion => ({
       emotion,
@@ -84,7 +88,10 @@ function StatsContent() {
   const mostFrequentMood = useMemo(() => {
     if (filteredEntries.length === 0) return null;
     const counts: Record<string, number> = {};
-    filteredEntries.forEach(e => counts[e.emotion] = (counts[e.emotion] || 0) + 1);
+    filteredEntries.forEach(e => {
+      const emotionKey: Emotion = e.primaryEmotionKey || e.emotion || 'neutral';
+      counts[emotionKey] = (counts[emotionKey] || 0) + 1;
+    });
     const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
     if (sorted.length === 0) return null;
     const topMood = sorted[0][0] as Emotion;

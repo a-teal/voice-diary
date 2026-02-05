@@ -45,11 +45,20 @@ describe('emotion module', () => {
   describe('EMOTIONS array', () => {
     it('should contain all emotion keys', () => {
       expect(EMOTIONS).toEqual(expect.arrayContaining([
-        'happy', 'excited', 'proud', 'peaceful',
-        'neutral',
-        'sad', 'angry', 'anxious', 'exhausted',
-        'surprised'
+        'happy', 'grateful', 'excited', 'peaceful',
+        'neutral', 'thoughtful',
+        'sad', 'angry', 'anxious', 'exhausted'
       ]));
+    });
+
+    it('should NOT contain removed emotions', () => {
+      expect(EMOTIONS).not.toContain('proud');
+      expect(EMOTIONS).not.toContain('surprised');
+    });
+
+    it('should contain new emotions', () => {
+      expect(EMOTIONS).toContain('grateful');
+      expect(EMOTIONS).toContain('thoughtful');
     });
   });
 
@@ -103,6 +112,48 @@ describe('emotion module', () => {
     it('should return neutral for unknown emotion', () => {
       expect(normalizeEmotion('알수없음')).toBe('neutral');
       expect(normalizeEmotion('')).toBe('neutral');
+    });
+
+    // 새로운 감정 타입 테스트
+    it('should normalize grateful emotions', () => {
+      expect(normalizeEmotion('감사')).toBe('grateful');
+      expect(normalizeEmotion('고마움')).toBe('grateful');
+      expect(normalizeEmotion('뿌듯')).toBe('grateful');
+    });
+
+    it('should normalize thoughtful emotions (갈등/고민)', () => {
+      expect(normalizeEmotion('고민')).toBe('thoughtful');
+      expect(normalizeEmotion('갈등')).toBe('thoughtful');
+      expect(normalizeEmotion('선택')).toBe('thoughtful');
+      expect(normalizeEmotion('결정')).toBe('thoughtful');
+    });
+  });
+
+  // 검증용 테스트 케이스 (갈등/피로 시나리오)
+  describe('Verification Test Cases', () => {
+    describe('갈등 시나리오 (thoughtful)', () => {
+      it('should normalize conflict-related keywords to thoughtful', () => {
+        expect(normalizeEmotion('고민')).toBe('thoughtful');
+        expect(normalizeEmotion('갈등')).toBe('thoughtful');
+        expect(normalizeEmotion('선택')).toBe('thoughtful');
+        expect(normalizeEmotion('결정')).toBe('thoughtful');
+      });
+
+      it('thoughtful should be in EMOTIONS array', () => {
+        expect(EMOTIONS).toContain('thoughtful');
+      });
+    });
+
+    describe('피로 시나리오 (exhausted)', () => {
+      it('should normalize fatigue-related keywords to exhausted', () => {
+        expect(normalizeEmotion('피곤')).toBe('exhausted');
+        expect(normalizeEmotion('지침')).toBe('exhausted');
+        expect(normalizeEmotion('피로')).toBe('exhausted');
+      });
+
+      it('exhausted should be in EMOTIONS array', () => {
+        expect(EMOTIONS).toContain('exhausted');
+      });
     });
   });
 

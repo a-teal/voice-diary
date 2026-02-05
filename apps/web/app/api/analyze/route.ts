@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { AnalysisResult, EmotionWeight } from '@/types';
+import { AnalysisResult } from '@/types';
 import { Emotion } from '@/types';
 
 // ============================================================
@@ -7,23 +7,22 @@ import { Emotion } from '@/types';
 // ============================================================
 
 const VALID_EMOTIONS: Emotion[] = [
-  'happy', 'excited', 'proud', 'peaceful',
-  'neutral',
-  'sad', 'angry', 'anxious', 'exhausted',
-  'surprised'
+  'happy', 'grateful', 'excited', 'peaceful',
+  'neutral', 'thoughtful',
+  'sad', 'angry', 'anxious', 'exhausted'
 ];
 
 const EMOTION_EMOJI: Record<Emotion, string> = {
   happy: '😊',
+  grateful: '🥰',
   excited: '🤩',
-  proud: '🥰',
   peaceful: '😌',
   neutral: '😐',
+  thoughtful: '🤔',
   sad: '😢',
   angry: '😡',
   anxious: '😰',
   exhausted: '😫',
-  surprised: '😲',
 };
 
 // Rate limiting (간단 버전)
@@ -57,73 +56,60 @@ const ANALYSIS_PROMPT = `일기 텍스트를 분석해서 감정과 키워드를
 ## 출력 형식
 JSON만 반환. 다른 텍스트 없이.
 {
-  "primaryEmotion": "가장 강한 감정 (영어 키)",
-  "secondaryEmotions": ["두번째 감정", "세번째 감정"],
-  "emotionWeights": [
-    {"emotion": "primaryEmotion과 동일", "weight": 0.6},
-    {"emotion": "secondaryEmotions[0]", "weight": 0.25},
-    {"emotion": "secondaryEmotions[1]", "weight": 0.15}
-  ],
-  "keywords": ["키워드1", "키워드2", "키워드3"],
-  "summary": "친구처럼 위트있게 한마디 (15자 이내)"
+  "summary": "한 문장 요약",
+  "primaryEmotionKey": "감정키",
+  "secondaryEmotionKeys": [],
+  "keywords": ["키워드1", "키워드2"]
 }
 
-## 감정 가중치 규칙
-- primaryEmotion: 가장 강한 감정 1개 (weight 0.4~0.8)
-- secondaryEmotions: 부가 감정 0~2개 (없으면 빈 배열)
-- emotionWeights: 모든 감정의 가중치 합 = 1.0
-- 단일 감정만 느껴지면 secondaryEmotions: [], emotionWeights: [{"emotion": "...", "weight": 1.0}]
+## 10가지 감정 (영어 키만 사용)
+- 긍정: happy(기쁨), grateful(감사), excited(설렘), peaceful(평온)
+- 중립: neutral(무난), thoughtful(고민/갈등)
+- 부정: sad(슬픔), angry(분노), anxious(불안), exhausted(지침)
 
-## summary 규칙
-- 독후감 금지 ("~를 토로하고 있다", "~한 하루였다" 같은 딱딱한 표현 X)
-- 친구가 공감하듯 가볍게 한마디
-- 예시:
-  - "피곤해" → "오늘 빡셌구나 😮‍💨"
-  - "맛있는 거 먹었다" → "먹방 성공 👍"
-  - "짜증나" → "에휴... 고생했다"
-  - "좋은 일 있었다" → "오 뭔데뭔데?"
+## summary 규칙 (중요!)
+- 금지: 캐주얼/나이브 표현 ("오늘 ~했네요", "좋은 하루예요", "~구나!", 이모지)
+- 필수: 관찰자적 위로, 의미 부여, 한 문장
+- 은유 허용 (과하지 않게)
+- 감정 정의 대신 마음을 읽는 문장
 
-## 감정 규칙
+좋은 예시:
+- "작은 성취가 쌓여 단단해지는 중이다"
+- "익숙한 것들 사이에서 잠시 숨을 고른 하루"
+- "선택의 무게가 어깨를 짓누르고 있다"
+- "지친 몸이 보내는 신호를 무시하기 어려운 날"
 
-### 10가지 감정 (영어 키만 사용)
-- 긍정: happy(기쁨), excited(설렘), proud(뿌듯), peaceful(평온)
-- 중립: neutral (거의 사용 안 함)
-- 부정: sad(슬픔), angry(짜증/분노), anxious(불안/걱정), exhausted(피곤/지침)
-- 기타: surprised(놀람)
+나쁜 예시 (절대 금지):
+- "오늘 회의했네요!" (캐주얼)
+- "피곤한 하루였구나" (나이브)
+- "좋은 일이 있었네요 😊" (이모지)
 
-### neutral은 거의 틀린 선택
-다음이 모두 충족될 때만 neutral:
-- 감정/평가 단어 없음
-- 감탄사/한숨 없음 (하…, 휴, 에휴, 아 진짜)
-- 불확실/갈등 없음 (해야, 모르겠, 어쩌지)
-- 순수한 사실 나열만 ("12시에 점심 먹었다")
+## 감정 선택 규칙
+- 갈등/의사결정 언급 → thoughtful 우선
+- 피로/컨디션 저하 → exhausted 우선
+- neutral 기본값 금지 (명확한 근거 없으면 다른 감정 선택)
 
-### 감정 우선순위 (이 순서대로 판단)
-1. 피곤/지침 → exhausted
-2. 걱정/불안/해야/모르겠 → anxious
-3. 짜증/답답 → angry
-4. 슬픔/우울 → sad
-5. 놀람/충격 → surprised
-6. 성취/뿌듯/감사 → proud
+### 감정 우선순위
+1. 피로/지침/컨디션 저하 → exhausted
+2. 갈등/선택/결정/고민 → thoughtful
+3. 걱정/불안 → anxious
+4. 짜증/답답/분노 → angry
+5. 슬픔/우울 → sad
+6. 감사/고마움 → grateful
 7. 기대/설렘 → excited
 8. 편안/안도 → peaceful
 9. 기쁨/행복 → happy
-10. 순수 사실만 → neutral
+10. 순수 사실 나열만 → neutral (거의 사용 안 함)
 
-## 키워드 규칙
+## secondaryEmotionKeys 규칙
+- 0~2개
+- primaryEmotionKey와 중복 금지
+- 복합 감정일 때만 사용
 
-### 3-5개 구체적 명사 추출
-- Event/Action: 회의, 출장, 운동, 약속
-- Topic/Entity: 팀장, 프로젝트, 카페
-- Outcome: 결정, 연기, 완료
-
-### 절대 제외
-- 감정 단어: 행복, 슬픔, 불안, 피곤, 걱정
-- 일반어: 하루, 일상, 기록, 생각, 오늘
-
-### 예시
-- "강남역에서 친구랑 떡볶이 먹었다" → ["강남역", "친구", "떡볶이"]
-- "팀 회의에서 일정 조정했다" → ["회의", "일정", "조정"]
+## keywords 규칙
+- 2~5개, unique
+- 구체적 명사: 고유명사 > 행위 > 사물 > 맥락
+- 절대 제외: 감정 단어(행복, 슬픔), 일반어(하루, 오늘)
 
 ## 분석할 텍스트
 "{transcript}"`;
@@ -213,52 +199,47 @@ export async function POST(request: NextRequest) {
     }
 
     const parsed = JSON.parse(jsonMatch[0]);
-    console.log('[Analyze] Parsed:', parsed);
+    console.log('[Analyze] Parsed JSON:', JSON.stringify(parsed, null, 2));
 
     // 6. 결과 검증 및 정리
-    const primaryEmotion: Emotion = VALID_EMOTIONS.includes(parsed.primaryEmotion)
-      ? parsed.primaryEmotion
-      : 'neutral';
+    const primaryEmotionKey: Emotion = VALID_EMOTIONS.includes(parsed.primaryEmotionKey)
+      ? parsed.primaryEmotionKey
+      : 'peaceful'; // neutral 기본값 금지
 
-    // secondaryEmotions 검증 (최대 2개)
-    const secondaryEmotions: Emotion[] = Array.isArray(parsed.secondaryEmotions)
-      ? parsed.secondaryEmotions
-          .filter((e: unknown) => typeof e === 'string' && VALID_EMOTIONS.includes(e as Emotion))
+    // secondaryEmotionKeys 검증 (최대 2개, primary와 중복 금지)
+    const secondaryEmotionKeys: Emotion[] = Array.isArray(parsed.secondaryEmotionKeys)
+      ? parsed.secondaryEmotionKeys
+          .filter((e: unknown) =>
+            typeof e === 'string' &&
+            VALID_EMOTIONS.includes(e as Emotion) &&
+            e !== primaryEmotionKey // primary와 중복 금지
+          )
           .slice(0, 2) as Emotion[]
       : [];
 
-    // emotionWeights 검증
-    const emotionWeights: EmotionWeight[] = Array.isArray(parsed.emotionWeights)
-      ? parsed.emotionWeights
-          .filter((w: { emotion?: unknown; weight?: unknown }) =>
-            typeof w.emotion === 'string' &&
-            VALID_EMOTIONS.includes(w.emotion as Emotion) &&
-            typeof w.weight === 'number' &&
-            w.weight >= 0 && w.weight <= 1
-          )
-          .map((w: { emotion: string; weight: number }) => ({
-            emotion: w.emotion as Emotion,
-            weight: w.weight,
-          }))
-      : [{ emotion: primaryEmotion, weight: 1.0 }];
-
-    const keywords: string[] = Array.isArray(parsed.keywords)
-      ? parsed.keywords.filter((k: unknown) => typeof k === 'string').slice(0, 6)
+    // keywords 검증 (2-5개, unique)
+    const rawKeywords: string[] = Array.isArray(parsed.keywords)
+      ? (parsed.keywords as unknown[]).filter((k): k is string => typeof k === 'string')
       : [];
+    const keywords = Array.from(new Set(rawKeywords)).slice(0, 5);
 
-    const summary: string = String(parsed.summary || '').slice(0, 50) || '오늘의 기록';
+    const summary: string = String(parsed.summary || '').slice(0, 100) || '오늘 하루의 기록';
 
     const result: AnalysisResult & { emoji: string } = {
-      emotion: primaryEmotion,  // 하위 호환용
-      primaryEmotion,
-      secondaryEmotions: secondaryEmotions.length > 0 ? secondaryEmotions : undefined,
-      emotionWeights,
-      emoji: EMOTION_EMOJI[primaryEmotion],
-      keywords,
       summary,
+      primaryEmotionKey,
+      secondaryEmotionKeys: secondaryEmotionKeys.length > 0 ? secondaryEmotionKeys : undefined,
+      keywords,
+      emoji: EMOTION_EMOJI[primaryEmotionKey],
     };
 
-    console.log('[Analyze] Final result:', result);
+    // 검증용 로그
+    console.log('[Analyze] Final result:', JSON.stringify({
+      summary: result.summary,
+      primaryEmotionKey: result.primaryEmotionKey,
+      secondaryEmotionKeys: result.secondaryEmotionKeys,
+      keywords: result.keywords,
+    }, null, 2));
 
     return NextResponse.json(result, {
       headers: { 'X-RateLimit-Remaining': String(rateLimit.remaining) },

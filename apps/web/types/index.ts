@@ -1,25 +1,18 @@
-// 감정 타입 (10가지: 긍정 4, 중립 1, 부정 4, 기타 1)
+// 감정 타입 (10가지: 긍정 4, 중립 2, 부정 4)
 export type Emotion =
   // 긍정
   | 'happy'      // 😊 기쁨
+  | 'grateful'   // 🥰 감사
   | 'excited'    // 🤩 설렘
-  | 'proud'      // 🥰 뿌듯
   | 'peaceful'   // 😌 평온
   // 중립
   | 'neutral'    // 😐 무난
+  | 'thoughtful' // 🤔 고민
   // 부정
   | 'sad'        // 😢 슬픔
   | 'angry'      // 😡 분노
   | 'anxious'    // 😰 불안
-  | 'exhausted'  // 😫 지침
-  // 기타
-  | 'surprised'; // 😲 놀람
-
-// 감정 가중치 (확신도)
-export interface EmotionWeight {
-  emotion: Emotion;
-  weight: number;  // 0.0 ~ 1.0 (가중치/확신도)
-}
+  | 'exhausted'; // 😫 지침
 
 // 일기 엔트리
 export interface DiaryEntry {
@@ -29,19 +22,23 @@ export interface DiaryEntry {
 
   transcript: string;     // 음성 → 텍스트
 
-  keywords: string[];     // AI 추출 해시태그 (3-6개)
-  emotion: Emotion;       // 대표 감정 (UI 표시용, primaryEmotion과 동일)
+  keywords: string[];     // AI 추출 해시태그 (2-5개)
   summary?: string;       // AI 한줄 요약
 
-  // 복수 감정 시스템
-  primaryEmotion: Emotion;              // 대표 감정 (UI 표시)
-  secondaryEmotions?: Emotion[];        // 부가 감정 (최대 2개, 내부 분석용)
-  emotionWeights?: EmotionWeight[];     // 감정별 가중치 (내부 학습용)
+  // 복수 감정 시스템 (신규 스키마)
+  primaryEmotionKey: Emotion;           // 대표 감정 (UI 표시)
+  secondaryEmotionKeys?: Emotion[];     // 부가 감정 (0-2개, primary와 중복 금지)
+
+  // 하위 호환용 필드
+  emotion?: Emotion;                    // deprecated: primaryEmotionKey 사용
 
   // B 준비용 교정 필드
   isCorrected?: boolean;         // 사용자가 감정을 교정했는지
-  correctedEmotion?: Emotion;    // 교정된 감정 (원본 emotion은 유지)
+  correctedEmotion?: Emotion;    // 교정된 감정 (원본 유지)
   correctedAt?: string;          // 교정 시각
+
+  // Soft Delete
+  deletedAt?: string;            // 삭제 시각 (null이면 활성)
 
   editedAt?: string;
   syncedAt?: string;
@@ -49,13 +46,10 @@ export interface DiaryEntry {
 
 // AI 분석 응답
 export interface AnalysisResult {
-  keywords: string[];
-  emotion: Emotion;              // 하위 호환용 (= primaryEmotion)
   summary: string;
-  // 복수 감정
-  primaryEmotion: Emotion;
-  secondaryEmotions?: Emotion[];
-  emotionWeights?: EmotionWeight[];
+  primaryEmotionKey: Emotion;
+  secondaryEmotionKeys?: Emotion[];  // 0-2개, primaryEmotionKey와 중복 금지
+  keywords: string[];                 // 2-5개, unique
 }
 
 // 녹음 상태

@@ -2,7 +2,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'com.voicediary.app',
-  appName: 'Voice Diary',
+  appName: '말로 쓰는 일기',
   webDir: 'out'
 };
 

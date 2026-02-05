@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Clock, ChevronDown, ChevronUp, X } from 'lucide-react';
+import { Clock, ChevronDown, ChevronUp, X, Trash2 } from 'lucide-react';
 import { DiaryEntry, Emotion } from '@/types';
 import { EMOTION_MAP, EMOTIONS } from '@/lib/emotion';
 
@@ -12,15 +12,17 @@ interface EntryCardProps {
   compact?: boolean;
   onClose?: () => void;
   onEmotionCorrect?: (entryId: string, newEmotion: Emotion) => void;
+  onDelete?: (entryId: string) => void;
 }
 
-export default function EntryCard({ entry, compact = false, onClose, onEmotionCorrect }: EntryCardProps) {
+export default function EntryCard({ entry, compact = false, onClose, onEmotionCorrect, onDelete }: EntryCardProps) {
   const router = useRouter();
   const [isExpanded, setIsExpanded] = useState(false);
   const [showEmotionPicker, setShowEmotionPicker] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-  // Use corrected emotion if available, otherwise use original
-  const displayEmotion = entry.correctedEmotion || entry.emotion;
+  // Use corrected emotion if available, otherwise use primaryEmotionKey (fallback to emotion for legacy)
+  const displayEmotion = entry.correctedEmotion || entry.primaryEmotionKey || entry.emotion || 'neutral';
   const emotionData = EMOTION_MAP[displayEmotion];
 
   const handleEmotionClick = (e: React.MouseEvent) => {
@@ -132,6 +134,20 @@ export default function EntryCard({ entry, compact = false, onClose, onEmotionCo
           <div>
             <div className="flex items-center gap-2">
               <span className="font-bold text-slate-800">{emotionData.labelKo}</span>
+              {/* Secondary Emotion Chips */}
+              {entry.secondaryEmotionKeys && entry.secondaryEmotionKeys.length > 0 && (
+                <div className="flex gap-1">
+                  {entry.secondaryEmotionKeys.map((emotion) => (
+                    <span
+                      key={emotion}
+                      className="text-xs bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded-full"
+                      title={EMOTION_MAP[emotion]?.labelKo}
+                    >
+                      {EMOTION_MAP[emotion]?.emoji}
+                    </span>
+                  ))}
+                </div>
+              )}
               <span className="text-xs text-slate-400 flex items-center gap-1 bg-slate-50 px-2 py-0.5 rounded-full">
                 <Clock className="w-3 h-3" />
                 {formatTime(entry.createdAt)}
@@ -152,15 +168,69 @@ export default function EntryCard({ entry, compact = false, onClose, onEmotionCo
             )}
           </div>
         </div>
-        {onClose && (
-          <button
-            onClick={onClose}
-            className="p-1.5 hover:bg-slate-100 rounded-full transition-colors"
-          >
-            <X className="w-4 h-4 text-slate-400" />
-          </button>
-        )}
+        <div className="flex items-center gap-1">
+          {onDelete && (
+            <button
+              onClick={() => setShowDeleteConfirm(true)}
+              className="p-1.5 hover:bg-red-50 rounded-full transition-colors"
+              title="삭제"
+            >
+              <Trash2 className="w-4 h-4 text-slate-400 hover:text-red-500" />
+            </button>
+          )}
+          {onClose && (
+            <button
+              onClick={onClose}
+              className="p-1.5 hover:bg-slate-100 rounded-full transition-colors"
+            >
+              <X className="w-4 h-4 text-slate-400" />
+            </button>
+          )}
+        </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      <AnimatePresence>
+        {showDeleteConfirm && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+            onClick={() => setShowDeleteConfirm(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-2xl p-6 mx-4 max-w-sm w-full"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h3 className="text-lg font-bold text-slate-800 mb-2">일기 삭제</h3>
+              <p className="text-slate-600 text-sm mb-4">
+                이 일기를 삭제하시겠습니까? 삭제된 일기는 복구할 수 없습니다.
+              </p>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setShowDeleteConfirm(false)}
+                  className="flex-1 py-2 px-4 bg-slate-100 text-slate-700 rounded-xl font-medium hover:bg-slate-200 transition-colors"
+                >
+                  취소
+                </button>
+                <button
+                  onClick={() => {
+                    onDelete?.(entry.id);
+                    setShowDeleteConfirm(false);
+                  }}
+                  className="flex-1 py-2 px-4 bg-red-500 text-white rounded-xl font-medium hover:bg-red-600 transition-colors"
+                >
+                  삭제
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Summary */}
       {entry.summary && (

@@ -30,12 +30,13 @@ export default function EmotionChart({ entries, days = 7 }: EmotionChartProps) {
 
       const entry = entries.find((e) => e.date === dateStr);
 
+      const emotionKey = entry?.primaryEmotionKey || entry?.emotion || 'neutral';
       data.push({
         date: dateStr,
         day: date.toLocaleDateString('ko-KR', { weekday: 'short' }),
-        value: entry ? MOOD_VALUES[entry.emotion] : null,
-        emotion: entry?.emotion || null,
-        emoji: entry ? EMOTION_MAP[entry.emotion].emoji : null,
+        value: entry ? MOOD_VALUES[emotionKey] : null,
+        emotion: entry ? emotionKey : null,
+        emoji: entry ? EMOTION_MAP[emotionKey]?.emoji : null,
       });
     }
 

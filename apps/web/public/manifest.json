@@ -1,6 +1,6 @@
 {
-  "name": "Voice Diary",
-  "short_name": "VoiceDiary",
+  "name": "말로 쓰는 일기",
+  "short_name": "말로일기",
   "description": "음성으로 기록하고, AI가 분석하는 감정 일기",
   "start_url": "/",
   "display": "standalone",

@@ -25,18 +25,17 @@ export const EMOTION_MAP: Record<Emotion, {
 }> = {
   // 긍정
   happy: { emoji: '😊', label: 'Happy', labelKo: '기쁨', color: '#FFD93D' },
+  grateful: { emoji: '🥰', label: 'Grateful', labelKo: '감사', color: '#FF6B8A' },
   excited: { emoji: '🤩', label: 'Excited', labelKo: '설렘', color: '#FF9F43' },
-  proud: { emoji: '🥰', label: 'Proud', labelKo: '뿌듯', color: '#FF6B8A' },
   peaceful: { emoji: '😌', label: 'Peaceful', labelKo: '평온', color: '#55efc4' },
   // 중립
   neutral: { emoji: '😐', label: 'Neutral', labelKo: '무난', color: '#BDC3C7' },
+  thoughtful: { emoji: '🤔', label: 'Thoughtful', labelKo: '고민', color: '#74b9ff' },
   // 부정
   sad: { emoji: '😢', label: 'Sad', labelKo: '슬픔', color: '#5f8cff' },
   angry: { emoji: '😡', label: 'Angry', labelKo: '분노', color: '#FF6B6B' },
   anxious: { emoji: '😰', label: 'Anxious', labelKo: '불안', color: '#a29bfe' },
   exhausted: { emoji: '😫', label: 'Exhausted', labelKo: '지침', color: '#95A5A6' },
-  // 기타
-  surprised: { emoji: '😲', label: 'Surprised', labelKo: '놀람', color: '#74b9ff' },
 };
 
 /**
@@ -48,10 +47,9 @@ export const EMOTIONS = Object.keys(EMOTION_MAP) as Emotion[];
  * 유효한 감정 목록 (검증용)
  */
 export const VALID_EMOTIONS: Emotion[] = [
-  'happy', 'excited', 'proud', 'peaceful',
-  'neutral',
-  'sad', 'angry', 'anxious', 'exhausted',
-  'surprised'
+  'happy', 'grateful', 'excited', 'peaceful',
+  'neutral', 'thoughtful',
+  'sad', 'angry', 'anxious', 'exhausted'
 ];
 
 /**
@@ -60,9 +58,9 @@ export const VALID_EMOTIONS: Emotion[] = [
 export const MOOD_VALUES: Record<Emotion, number> = {
   excited: 10,
   happy: 9,
-  proud: 8,
+  grateful: 8,
   peaceful: 7,
-  surprised: 6,
+  thoughtful: 6,
   neutral: 5,
   anxious: 3,
   exhausted: 2,
@@ -81,17 +79,16 @@ const EMOTION_KR_TO_EN: Record<string, Emotion> = {
   // 긍정
   '행복': 'happy', '기쁨': 'happy', '즐거움': 'happy',
   '신남': 'excited', '설렘': 'excited', '기대': 'excited',
-  '뿌듯': 'proud', '성취': 'proud', '자랑': 'proud', '감사': 'proud',
+  '감사': 'grateful', '고마움': 'grateful', '뿌듯': 'grateful', '성취': 'grateful',
   '평온': 'peaceful', '편안': 'peaceful', '안도': 'peaceful',
   // 중립
   '무난': 'neutral', '보통': 'neutral',
+  '고민': 'thoughtful', '갈등': 'thoughtful', '선택': 'thoughtful', '결정': 'thoughtful',
   // 부정
   '슬픔': 'sad', '우울': 'sad', '외로움': 'sad',
   '화남': 'angry', '짜증': 'angry', '분노': 'angry',
-  '불안': 'anxious', '걱정': 'anxious', '초조': 'anxious', '고민': 'anxious',
+  '불안': 'anxious', '걱정': 'anxious', '초조': 'anxious',
   '지침': 'exhausted', '피곤': 'exhausted', '피로': 'exhausted',
-  // 기타
-  '놀람': 'surprised', '충격': 'surprised', '깜짝': 'surprised',
 };
 
 // ============================================================

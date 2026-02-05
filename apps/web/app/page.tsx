@@ -109,7 +109,7 @@ export default function Home() {
             {/* Emotion summary for the day */}
             <div className="flex gap-2 overflow-x-auto pb-2">
               {entries.map((entry) => {
-                const displayEmotion = entry.correctedEmotion || entry.emotion;
+                const displayEmotion: Emotion = entry.correctedEmotion || entry.primaryEmotionKey || entry.emotion || 'neutral';
                 return (
                   <button
                     key={entry.id}
@@ -120,7 +120,7 @@ export default function Home() {
                         : 'bg-white shadow-[inset_0_0_0_1px_rgb(226,232,240)]'
                     }`}
                   >
-                    <span className="text-2xl">{EMOTION_MAP[displayEmotion].emoji}</span>
+                    <span className="text-2xl">{EMOTION_MAP[displayEmotion]?.emoji}</span>
                     <span className="text-xs text-slate-500 mt-1">
                       {format(new Date(entry.createdAt), 'HH:mm')}
                     </span>

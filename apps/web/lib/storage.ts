@@ -2,11 +2,16 @@ import { DiaryEntry } from '@/types';
 
 const STORAGE_KEY = 'voice-diary-entries';
 
-// 모든 일기 조회
-export function getAllEntries(): DiaryEntry[] {
+// 모든 일기 조회 (삭제된 항목 포함 - 내부용)
+function getAllEntriesRaw(): DiaryEntry[] {
   if (typeof window === 'undefined') return [];
   const data = localStorage.getItem(STORAGE_KEY);
   return data ? JSON.parse(data) : [];
+}
+
+// 모든 일기 조회 (삭제된 항목 제외)
+export function getAllEntries(): DiaryEntry[] {
+  return getAllEntriesRaw().filter(entry => !entry.deletedAt);
 }
 
 // 날짜별 일기 조회 (단일 - 하위 호환)
@@ -32,7 +37,7 @@ export function getEntriesByMonth(year: number, month: number): DiaryEntry[] {
 
 // 일기 저장
 export function saveEntry(entry: DiaryEntry): void {
-  const entries = getAllEntries();
+  const entries = getAllEntriesRaw();
   const existingIndex = entries.findIndex(e => e.id === entry.id);
 
   if (existingIndex >= 0) {
@@ -46,7 +51,7 @@ export function saveEntry(entry: DiaryEntry): void {
 
 // 일기 수정
 export function updateEntry(id: string, updates: Partial<DiaryEntry>): void {
-  const entries = getAllEntries();
+  const entries = getAllEntriesRaw();
   const index = entries.findIndex(e => e.id === id);
 
   if (index >= 0) {
@@ -55,11 +60,15 @@ export function updateEntry(id: string, updates: Partial<DiaryEntry>): void {
   }
 }
 
-// 일기 삭제
+// 일기 삭제 (Soft Delete)
 export function deleteEntry(id: string): void {
-  const entries = getAllEntries();
-  const filtered = entries.filter(e => e.id !== id);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
+  const entries = getAllEntriesRaw();
+  const index = entries.findIndex(e => e.id === id);
+
+  if (index >= 0) {
+    entries[index] = { ...entries[index], deletedAt: new Date().toISOString() };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+  }
 }
 
 // 고유 ID 생성
