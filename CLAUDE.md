@@ -40,8 +40,10 @@ Project Dairy/
 - **STT**:
   - 웹: Web Speech API (브라우저 내장)
   - 네이티브: @capacitor-community/speech-recognition
-- **저장소**: localStorage (로컬 저장)
+- **저장소**: localStorage (로컬) + Firestore (클라우드 동기화)
+- **인증**: Firebase Auth (Google, Apple OAuth)
 - **모바일**: Capacitor (iOS/Android)
+- **Bundle ID**: life.voicediary.app
 
 ## Web 앱 구조 (apps/web)
 
@@ -62,7 +64,10 @@ apps/web/
 │   ├── emotion.ts         # 감정 상수/매핑/검증 (통합)
 │   ├── hashtags.ts        # 해시태그 엔진
 │   ├── prompts.ts         # AI 프롬프트
-│   └── storage.ts         # localStorage
+│   ├── storage.ts         # localStorage + Firestore 동기화
+│   ├── firebase.ts        # Firebase 초기화
+│   ├── auth.ts            # Firebase Auth (Google/Apple)
+│   └── firestore.ts       # Firestore CRUD
 ├── types/                 # TypeScript 타입
 ├── __tests__/             # 테스트
 ├── ios/                   # Capacitor iOS 프로젝트
@@ -91,7 +96,13 @@ npx cap open android      # Android Studio 열기
 ## 환경 변수
 
 ```
-ANTHROPIC_API_KEY=sk-ant-xxxxx  # Claude API 키 (필수)
+ANTHROPIC_API_KEY=sk-ant-xxxxx                    # Claude API 키 (필수)
+NEXT_PUBLIC_FIREBASE_API_KEY=xxxxx                # Firebase
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=xxxxx
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=xxxxx
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=xxxxx
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=xxxxx
+NEXT_PUBLIC_FIREBASE_APP_ID=xxxxx
 ```
 
 ## 코딩 컨벤션

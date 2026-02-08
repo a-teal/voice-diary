@@ -169,18 +169,53 @@
 
 ---
 
-## Phase 5: 고도화 (예정)
+## Phase 5: 고도화
 
-### 5.1 백엔드
-- [ ] Supabase 연동
-- [ ] 사용자 인증 (소셜 로그인)
-- [ ] 클라우드 동기화
+### 5.1 Firebase 연동
+- [x] Firebase 프로젝트 생성 (voice-diary-d1e77)
+- [x] Firebase SDK 설치 (v12.9.0)
+- [x] Firebase 초기화 설정 (firebase.ts)
+- [x] Firestore CRUD 구현 (firestore.ts)
+- [x] localStorage ↔ Firestore 동기화 (storage.ts, useDiarySync.ts)
+- [x] Vercel 환경변수 등록 (6개 × 3환경)
+
+### 5.1.1 Firebase Authentication
+- [x] Google 로그인 구현 (auth.ts)
+- [x] Apple 로그인 구현 (auth.ts)
+- [x] AuthProvider & useAuth 훅
+- [x] 로그인 페이지 (app/login/page.tsx)
+- [x] Firebase Console - Google 프로바이더 활성화
+- [x] Firebase Console - Apple 프로바이더 활성화
+- [x] Firebase Console - 승인 도메인 추가 (voicediary.life, web-zeta-five-44.vercel.app)
+- [x] Firestore Security Rules 설정 (본인 데이터만 접근)
+- [ ] Apple Sign-In 웹 설정 (Services ID, 키 생성, Firebase 연결)
+
+### 5.1.2 Apple Developer 설정
+- [x] Bundle ID 확정 (life.voicediary.app)
+- [x] Capacitor 설정 반영 (capacitor.config.ts, ios, android)
+- [ ] Apple Sign-In Services ID 생성
+- [ ] Apple Sign-In 키 발급
+- [ ] Firebase Console Apple 연결
+
+### 5.1.3 문서 정비
+- [x] FAQ 파일 Docs/ 폴더로 이동
+- [x] FAQ 내용 수정 (감정 수정 가능, 삭제 표현, 유료 플랜)
+- [x] 감정 팔레트 UI 개선 (인라인 펼침 + 연필 힌트)
 
 ### 5.2 추가 기능
 - [x] 일기 삭제 (Soft delete 구현 완료)
 - [ ] 일기 수정
 - [ ] 연간 통계
 - [ ] 알림/리마인더
+
+### 5.5 앱 스토어 배포
+- [ ] Apple Developer 계정 등록비 결제 ($99/년)
+- [ ] Google Play Developer 계정 등록 ($25 일회성)
+- [ ] 앱 아이콘 / 스플래시 스크린
+- [ ] iOS Simulator 테스트
+- [ ] Android Emulator 테스트
+- [ ] App Store 심사 제출
+- [ ] Play Store 출시
 
 ### 5.4 트래픽 증가 시 업그레이드 (백로그)
 

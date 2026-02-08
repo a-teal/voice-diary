@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Clock, ChevronDown, ChevronUp, X, Trash2 } from 'lucide-react';
+import { Clock, ChevronDown, ChevronUp, X, Trash2, Pencil } from 'lucide-react';
 import { DiaryEntry, Emotion } from '@/types';
 import { EMOTION_MAP, EMOTIONS } from '@/lib/emotion';
 
@@ -90,51 +90,25 @@ export default function EntryCard({ entry, compact = false, onClose, onEmotionCo
       animate={{ opacity: 1, y: 0 }}
       className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100"
     >
-      <div className="flex items-start justify-between mb-4">
+      <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-3">
-          <div className="relative">
-            <button
-              onClick={handleEmotionClick}
-              className={`text-4xl filter drop-shadow-sm transition-transform ${onEmotionCorrect ? 'hover:scale-110 cursor-pointer' : ''}`}
-              title={onEmotionCorrect ? '감정 수정하기' : undefined}
-            >
-              {emotionData.emoji}
-            </button>
+          <button
+            onClick={handleEmotionClick}
+            className={`relative text-4xl filter drop-shadow-sm transition-transform ${onEmotionCorrect ? 'hover:scale-110 cursor-pointer' : ''}`}
+          >
+            {emotionData.emoji}
+            {onEmotionCorrect && !showEmotionPicker && (
+              <span className="absolute -bottom-1 -right-1 w-5 h-5 bg-white rounded-full border border-slate-200 flex items-center justify-center shadow-sm">
+                <Pencil className="w-2.5 h-2.5 text-slate-400" />
+              </span>
+            )}
             {entry.isCorrected && (
               <span className="absolute -top-1 -right-1 w-3 h-3 bg-indigo-500 rounded-full border-2 border-white" title="수정됨" />
             )}
-
-            {/* Emotion Picker */}
-            <AnimatePresence>
-              {showEmotionPicker && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9, y: -10 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.9, y: -10 }}
-                  className="absolute top-full left-0 mt-2 z-50 bg-white rounded-xl shadow-lg border border-slate-200 p-2 grid grid-cols-5 gap-1"
-                >
-                  {EMOTIONS.map((emotion) => (
-                    <button
-                      key={emotion}
-                      onClick={() => handleEmotionSelect(emotion)}
-                      className={`text-2xl p-2 rounded-lg transition-colors ${
-                        emotion === displayEmotion
-                          ? 'bg-indigo-100'
-                          : 'hover:bg-slate-100'
-                      }`}
-                      title={EMOTION_MAP[emotion].labelKo}
-                    >
-                      {EMOTION_MAP[emotion].emoji}
-                    </button>
-                  ))}
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+          </button>
           <div>
             <div className="flex items-center gap-2">
               <span className="font-bold text-slate-800">{emotionData.labelKo}</span>
-              {/* Secondary Emotion Chips */}
               {entry.secondaryEmotionKeys && entry.secondaryEmotionKeys.length > 0 && (
                 <div className="flex gap-1">
                   {entry.secondaryEmotionKeys.map((emotion) => (
@@ -188,6 +162,37 @@ export default function EntryCard({ entry, compact = false, onClose, onEmotionCo
           )}
         </div>
       </div>
+
+      {/* Emotion Palette - expands inline below header */}
+      <AnimatePresence>
+        {showEmotionPicker && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="overflow-hidden"
+          >
+            <div className="bg-slate-50 rounded-xl p-3 mb-3 border border-slate-100">
+              <div className="flex flex-wrap justify-center gap-1">
+                {EMOTIONS.map((emotion) => (
+                  <button
+                    key={emotion}
+                    onClick={() => handleEmotionSelect(emotion)}
+                    className={`flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl transition-colors ${
+                      emotion === displayEmotion
+                        ? 'bg-indigo-100 ring-1 ring-indigo-300'
+                        : 'hover:bg-white'
+                    }`}
+                  >
+                    <span className="text-2xl">{EMOTION_MAP[emotion].emoji}</span>
+                    <span className="text-[10px] text-slate-500">{EMOTION_MAP[emotion].labelKo}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Delete Confirmation Modal */}
       <AnimatePresence>
