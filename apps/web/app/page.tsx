@@ -145,21 +145,31 @@ export default function Home() {
               })}
             </div>
 
-            {/* Selected entry or all entries */}
-            {selectedEntry ? (
-              <EntryCard
-                entry={selectedEntry}
-                onClose={() => setSelectedEntry(null)}
-                onEmotionCorrect={handleEmotionCorrect}
-                onDelete={handleDelete}
-              />
-            ) : (
-              entries.map((entry) => (
-                <div key={entry.id} onClick={() => setSelectedEntry(entry)} className="cursor-pointer">
-                  <EntryCard entry={entry} compact />
+            {/* Entry feed - Focus View */}
+            {entries.map((entry) => {
+              const isFocused = selectedEntry?.id === entry.id;
+              const isDimmed = !!selectedEntry && !isFocused;
+              return (
+                <div
+                  key={entry.id}
+                  onClick={() => {
+                    if (isFocused) return;
+                    setSelectedEntry(entry);
+                  }}
+                  className={!isFocused ? 'cursor-pointer' : ''}
+                >
+                  <EntryCard
+                    entry={entry}
+                    compact={!isFocused}
+                    focused={isFocused}
+                    dimmed={isDimmed}
+                    onClose={isFocused ? () => setSelectedEntry(null) : undefined}
+                    onEmotionCorrect={isFocused ? handleEmotionCorrect : undefined}
+                    onDelete={isFocused ? handleDelete : undefined}
+                  />
                 </div>
-              ))
-            )}
+              );
+            })}
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center h-[60vh] text-center space-y-6">

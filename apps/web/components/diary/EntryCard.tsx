@@ -10,12 +10,14 @@ import { EMOTION_MAP, EMOTIONS } from '@/lib/emotion';
 interface EntryCardProps {
   entry: DiaryEntry;
   compact?: boolean;
+  focused?: boolean;
+  dimmed?: boolean;
   onClose?: () => void;
   onEmotionCorrect?: (entryId: string, newEmotion: Emotion) => void;
   onDelete?: (entryId: string) => void;
 }
 
-export default function EntryCard({ entry, compact = false, onClose, onEmotionCorrect, onDelete }: EntryCardProps) {
+export default function EntryCard({ entry, compact = false, focused = false, dimmed = false, onClose, onEmotionCorrect, onDelete }: EntryCardProps) {
   const router = useRouter();
   const [isExpanded, setIsExpanded] = useState(false);
   const [showEmotionPicker, setShowEmotionPicker] = useState(false);
@@ -55,13 +57,15 @@ export default function EntryCard({ entry, compact = false, onClose, onEmotionCo
 
   const shouldTruncate = entry.transcript.length > 150;
 
-  // Compact view - just show summary
-  if (compact) {
+  // Compact / dimmed view
+  if (compact && !focused) {
     return (
       <motion.div
+        layout
         initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100"
+        animate={{ opacity: dimmed ? 0.5 : 1, y: 0 }}
+        transition={{ opacity: { duration: 0.2 }, layout: { duration: 0.3, type: 'spring', bounce: 0.15 } }}
+        className={`bg-white rounded-2xl p-4 shadow-sm border border-slate-100 ${dimmed ? 'pointer-events-none' : ''}`}
       >
         <div className="flex items-center gap-3">
           <span className="text-2xl">{emotionData.emoji}</span>
@@ -83,12 +87,14 @@ export default function EntryCard({ entry, compact = false, onClose, onEmotionCo
     );
   }
 
-  // Full view
+  // Focused / Full view
   return (
     <motion.div
+      layout
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100"
+      transition={{ opacity: { duration: 0.2 }, layout: { duration: 0.3, type: 'spring', bounce: 0.15 } }}
+      className={`bg-white rounded-2xl p-5 shadow-sm border ${focused ? 'border-indigo-200 shadow-md ring-1 ring-indigo-100' : 'border-slate-100'}`}
     >
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-3">
