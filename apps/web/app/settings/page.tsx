@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChevronLeft, Check, Globe } from 'lucide-react';
+import { ChevronLeft, Check, Globe, HelpCircle, ChevronDown } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
 import Link from 'next/link';
 import { LocaleMode, LOCALE_OPTIONS, getLocaleMode, setLocaleMode, resolveLocale } from '@/lib/i18n';
 
@@ -10,6 +11,7 @@ export default function SettingsPage() {
   const { t, i18n } = useTranslation();
   const [localeMode, setLocaleModeState] = useState<LocaleMode>('system');
   const [resolvedLocale, setResolvedLocale] = useState<'ko' | 'en'>('en');
+  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
 
   useEffect(() => {
     const mode = getLocaleMode();
@@ -83,6 +85,51 @@ export default function SettingsPage() {
                 {resolvedLocale === 'ko' ? '한국어' : 'English'}
               </span>
             </div>
+          </div>
+        </section>
+
+        {/* FAQ Section */}
+        <section className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+          <div className="p-4 border-b border-slate-100">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center">
+                <HelpCircle className="w-5 h-5 text-indigo-600" />
+              </div>
+              <h3 className="font-semibold text-slate-900">{t('settings.faq')}</h3>
+            </div>
+          </div>
+
+          <div className="divide-y divide-slate-100">
+            {(t('settings.faqItems', { returnObjects: true }) as Array<{ q: string; a: string }>).map((item, index) => (
+              <div key={index}>
+                <button
+                  onClick={() => setOpenFaqIndex(openFaqIndex === index ? null : index)}
+                  className="w-full px-4 py-3 flex items-center justify-between hover:bg-slate-50 transition-colors text-left"
+                >
+                  <span className="text-sm text-slate-700 pr-2">{item.q}</span>
+                  <ChevronDown
+                    className={`w-4 h-4 text-slate-400 shrink-0 transition-transform ${
+                      openFaqIndex === index ? 'rotate-180' : ''
+                    }`}
+                  />
+                </button>
+                <AnimatePresence>
+                  {openFaqIndex === index && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="overflow-hidden"
+                    >
+                      <p className="px-4 pb-3 text-sm text-slate-500 leading-relaxed">
+                        {item.a}
+                      </p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            ))}
           </div>
         </section>
       </div>

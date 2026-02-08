@@ -75,7 +75,42 @@
     "currentLanguage": "Current language",
     "systemOption": "System default",
     "korean": "한국어",
-    "english": "English"
+    "english": "English",
+    "faq": "FAQ",
+    "faqItems": [
+      {
+        "q": "What is SayLog?",
+        "a": "SayLog is a voice-based diary service that converts your speech to text and records your daily life and emotions."
+      },
+      {
+        "q": "How do I record a diary?",
+        "a": "Tap the record button and speak. Your voice will be converted to text and saved automatically."
+      },
+      {
+        "q": "What is AI emotion analysis?",
+        "a": "AI analyzes your speech to identify primary and secondary emotions. This is for reference only and does not provide medical or professional diagnosis."
+      },
+      {
+        "q": "Can I edit AI analysis results?",
+        "a": "Yes, you can tap the emotion icon to change it. AI analysis is for reference, and the final judgment is yours."
+      },
+      {
+        "q": "Can I delete my records?",
+        "a": "Yes, you can delete records. Deleted records are retained for a period before being permanently removed."
+      },
+      {
+        "q": "How is my data protected?",
+        "a": "Your voice and text data are securely stored following privacy principles. They are never shared publicly or used for AI training."
+      },
+      {
+        "q": "Is it available in multiple languages?",
+        "a": "The app defaults to your system language, and you can change it in settings. Records are saved in the language you speak."
+      },
+      {
+        "q": "Is it free to use?",
+        "a": "Basic features are free. Some premium features will be available through paid plans in the future."
+      }
+    ]
   },
   "date": {
     "format": "MMM d, yyyy",
