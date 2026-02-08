@@ -81,5 +81,15 @@
     "format": "yyyy년 M월 d일",
     "monthFormat": "yyyy년 M월",
     "weekdays": ["일", "월", "화", "수", "목", "금", "토"]
+  },
+  "auth": {
+    "title": "말로 쓰는 일기",
+    "subtitle": "로그인하고 일기를 안전하게 보관하세요",
+    "continueWithGoogle": "Google로 계속하기",
+    "continueWithApple": "Apple로 계속하기",
+    "signingIn": "로그인 중...",
+    "error": "로그인에 실패했어요. 다시 시도해주세요.",
+    "logout": "로그아웃",
+    "profile": "프로필"
   }
 }

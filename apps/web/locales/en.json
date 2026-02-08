@@ -81,5 +81,15 @@
     "format": "MMM d, yyyy",
     "monthFormat": "MMMM yyyy",
     "weekdays": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+  },
+  "auth": {
+    "title": "Voice Diary",
+    "subtitle": "Sign in to keep your diary safe",
+    "continueWithGoogle": "Continue with Google",
+    "continueWithApple": "Continue with Apple",
+    "signingIn": "Signing in...",
+    "error": "Sign in failed. Please try again.",
+    "logout": "Logout",
+    "profile": "Profile"
   }
 }
