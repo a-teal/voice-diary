@@ -35,15 +35,15 @@
   },
   "emotion": {
     "happy": "기쁨",
+    "grateful": "감사",
     "excited": "설렘",
-    "proud": "뿌듯",
     "peaceful": "평온",
     "neutral": "무난",
+    "thoughtful": "고민",
     "sad": "슬픔",
     "angry": "분노",
     "anxious": "불안",
-    "exhausted": "지침",
-    "surprised": "놀람"
+    "exhausted": "지침"
   },
   "calendar": {
     "title": "캘린더",

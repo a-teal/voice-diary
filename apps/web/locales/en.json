@@ -35,15 +35,15 @@
   },
   "emotion": {
     "happy": "Happy",
+    "grateful": "Grateful",
     "excited": "Excited",
-    "proud": "Proud",
     "peaceful": "Peaceful",
     "neutral": "Neutral",
+    "thoughtful": "Thoughtful",
     "sad": "Sad",
     "angry": "Angry",
     "anxious": "Anxious",
-    "exhausted": "Exhausted",
-    "surprised": "Surprised"
+    "exhausted": "Exhausted"
   },
   "calendar": {
     "title": "Calendar",
